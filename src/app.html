@@ -1828,26 +1828,29 @@ function t(k, vars){
 
 /* ================= Storage & Data ================= */
 const LS_KEY = "kapdabill_v2";
-const INITIAL_ITEMS = [
-  { id: "i1", name: "Handloom Cotton Kurta", cat: "Kurta", rate: 850, gst: 5, hsn: "6204" },
-  { id: "i2", name: "Premium Silk Saree", cat: "Saree", rate: 3500, gst: 12, hsn: "5208" },
-  { id: "i3", name: "Festive Georgette Lehenga", cat: "Lehenga", rate: 6499, gst: 12, hsn: "6204" },
-  { id: "i4", name: "Slim Fit Cotton Shirt", cat: "Shirt", rate: 799, gst: 5, hsn: "6205" },
-  { id: "i5", name: "Stretch Denim Jeans", cat: "Jeans", rate: 1299, gst: 5, hsn: "6203" },
-  { id: "i6", name: "Banarasi Zari Saree", cat: "Saree", rate: 4800, gst: 12, hsn: "5208" },
-  { id: "i7", name: "Anarkali Suit Set", cat: "Kurta", rate: 2199, gst: 5, hsn: "6204" },
-  { id: "i8", name: "Formal Trouser", cat: "Trousers", rate: 950, gst: 5, hsn: "6203" },
-  { id: "i9", name: "Embroidered Dupatta", cat: "Saree", rate: 450, gst: 5, hsn: "5208" },
-  { id: "i10", name: "Kids Ethnic Kurta Pajama", cat: "Kids", rate: 899, gst: 5, hsn: "6209" }
-];
+const INITIAL_ITEMS = [];
+const SAAS_API_BASE = "https://kapda-bill.onrender.com/api";
 
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+
+function getCleanPhone(phone){
+  return phone ? String(phone).replace(/\D/g, '').slice(-10) : "";
+}
+
+function getActiveShopId(){
+  const phone = (DB && DB.settings && DB.settings.mobile) ? getCleanPhone(DB.settings.mobile) : "";
+  if(phone) return "shop_" + phone;
+  if(DB && DB.settings && DB.settings.shopName){
+    return "shop_" + DB.settings.shopName.trim().toLowerCase().replace(/\s+/g, '_');
+  }
+  return "shop_default";
+}
 
 function defaultDB(){
   return {
     app: "kapdabill_pro",
     settings: {
-      shopName: "Bill Book",
+      shopName: "",
       address: "",
       mobile: "",
       logo: "",
@@ -1859,7 +1862,7 @@ function defaultDB(){
       gstMode: "regular",
       gstin: ""
     },
-    items: INITIAL_ITEMS,
+    items: [],
     bills: [],
     cart: {
       items: [], // { id, name, cat, rate, gst, hsn, qty }
@@ -1880,19 +1883,190 @@ try {
     DB = Object.assign({}, defaultDB(), parsed);
     if(parsed.settings) DB.settings = Object.assign({}, defaultDB().settings, parsed.settings);
     // Migrate any legacy placeholder defaults to blank so shopkeeper starts fresh
-    if(DB.settings.shopName === "Kalyani Boutique") DB.settings.shopName = "Bill Book";
+    if(DB.settings.shopName === "Kalyani Boutique") DB.settings.shopName = "";
     if(DB.settings.mobile === "9876543210") DB.settings.mobile = "";
     if(DB.settings.address === "Main Market, Fashion Street") DB.settings.address = "";
     if(DB.settings.gstin === "23AABCU9603R1ZM") DB.settings.gstin = "";
-    if(!Array.isArray(DB.items) || !DB.items.length) DB.items = INITIAL_ITEMS;
+    // SaaS Clean Slate: Starting with 0 items, filter out any legacy dummy mock items
+    if(Array.isArray(DB.items)){
+      DB.items = DB.items.filter(it => it && !/^i\d+$/.test(String(it.id)) && it.name !== "Handloom Cotton Kurta" && it.name !== "Premium Silk Saree");
+    } else {
+      DB.items = [];
+    }
   }
 } catch(e){}
 
 function persist(){
   try {
+    const shopId = getActiveShopId();
     localStorage.setItem(LS_KEY, JSON.stringify(DB));
+    localStorage.setItem("kapdabill_active_shop", shopId);
+    if(shopId !== "shop_default"){
+      localStorage.setItem("kapdabill_data_" + shopId, JSON.stringify(DB));
+      // Background sync to Render backend
+      if(navigator.onLine){
+        fetch(SAAS_API_BASE + "/backup/" + encodeURIComponent(shopId), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(DB)
+        }).catch(() => {});
+      }
+    }
     return true;
   } catch(e){ return false; }
+}
+
+async function lookupOrRegisterShop(shopName, mobile, address, forceNew = false, silent = false){
+  const cleanPhone = getCleanPhone(mobile);
+  const qName = String(shopName || "").trim();
+
+  if(!cleanPhone && !qName){
+    toast(LANG === "hi" ? "कृपया दुकान का नाम या मोबाइल नंबर डालें" : "Please enter shop name or mobile number");
+    return;
+  }
+
+  const shopId = cleanPhone ? ("shop_" + cleanPhone) : ("shop_" + qName.toLowerCase().replace(/\s+/g, '_'));
+
+  if(!silent) toast(LANG === "hi" ? "दुकान चेक हो रही है..." : "Checking shop registration...");
+
+  // 1. Check local storage first
+  const localRaw = localStorage.getItem("kapdabill_data_" + shopId);
+  let localData = null;
+  if(localRaw){
+    try { localData = JSON.parse(localRaw); } catch(e){}
+  }
+
+  // 2. Query SaaS Cloud API
+  let cloudResult = null;
+  if(navigator.onLine){
+    try {
+      const resp = await fetch(SAAS_API_BASE + "/shops/lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ shopName: qName, mobile: cleanPhone, address: address || "" })
+      });
+      if(resp.ok){
+        cloudResult = await resp.json();
+      }
+    } catch(e){
+      console.warn("Cloud lookup offline or failed", e);
+    }
+  }
+
+  if(cloudResult && cloudResult.exists && !forceNew){
+    // ALREADY REGISTERED SHOP! Restore its catalog items, bills, settings
+    const restored = cloudResult.data || localData;
+    if(restored && Array.isArray(restored.items)){
+      DB = restored;
+    } else {
+      DB = defaultDB();
+      DB.settings.shopName = cloudResult.shop.shopName || qName;
+      DB.settings.mobile = cloudResult.shop.mobile || cleanPhone;
+      DB.settings.address = cloudResult.shop.address || address || "";
+      DB.items = [];
+    }
+    if(!silent) toast(LANG === "hi" ? `✅ दुकान '${DB.settings.shopName}' पहले से रजिस्टर्ड है! (${DB.items.length} सामान लोड हुए)` : `✅ Shop '${DB.settings.shopName}' found! (${DB.items.length} items loaded)`);
+  } else if(localData && !forceNew){
+    // Registered in Local Storage
+    DB = localData;
+    if(!silent) toast(LANG === "hi" ? `✅ दुकान '${DB.settings.shopName}' लोड हो गई! (${DB.items.length} सामान)` : `✅ Loaded local shop '${DB.settings.shopName}' (${DB.items.length} items)`);
+  } else {
+    // BRAND NEW SHOP: Clean Slate with 0 items!
+    DB = defaultDB();
+    DB.settings.shopName = qName || (LANG === "hi" ? "नई दुकान" : "New Store");
+    DB.settings.mobile = cleanPhone;
+    DB.settings.address = address || "";
+    DB.items = [];
+    DB.bills = [];
+    if(!silent) toast(LANG === "hi" ? `🎉 नई दुकान रजिस्टर हो गई! कैटलॉग में 0 सामान हैं (Clean Slate)` : `🎉 New shop registered! Catalog starts clean with 0 items`);
+  }
+
+  // Save isolated storage & active shop
+  persist();
+  updateHeader();
+  render();
+}
+
+function openShopSwitchModal(){
+  const modalHost = $("#modalHost");
+  const isHi = LANG === "hi";
+
+  modalHost.innerHTML = `<div class="scrim" id="shopModalScrim" role="dialog" aria-modal="true">
+    <div class="sheet sheet-slide-in" id="shopModalSheet" style="max-height:85vh;overflow-y:auto;padding-bottom:24px">
+      <div class="sheet-drag-handle"></div>
+
+      <div class="sheet-header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:40px;height:40px;border-radius:12px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:22px;border:1px solid #bfdbfe">🏢</div>
+          <div>
+            <h3 class="sheet-title" style="font-size:18px">${isHi ? "दुकान रजिस्ट्रेशन / लॉगिन (SaaS)" : "Shop Registration & Lookup"}</h3>
+            <div class="sheet-sub" style="font-size:12px">${isHi ? "दुकान के नाम व मोबाइल से कैटलॉग लोड करें" : "Check if shop exists to render its items"}</div>
+          </div>
+        </div>
+        <button type="button" class="sheet-close" id="btnCloseShopModal">✕</button>
+      </div>
+
+      <div class="stack" style="gap:14px;margin-top:8px">
+        <div class="banner" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:12px 14px;font-size:12px;color:#1e40af;line-height:1.5">
+          ℹ️ ${isHi ? "यदि यह दुकान पहले से रजिस्टर्ड है, तो उसका पुराना कैटलॉग और सामान लोड हो जाएगा। यदि नई दुकान है, तो 0 सामान के साथ एकदम साफ शुरुआत होगी।" : "If this shop is already registered, its existing catalog & items will be restored. New shops start fresh with 0 items."}
+        </div>
+
+        <div>
+          <label class="cust-label" style="font-size:12px;font-weight:700">${t("shopName")} *</label>
+          <input type="text" id="mShopName" class="cust-inp" placeholder="${isHi ? 'उदा. राधे गारमेंट्स' : 'e.g. Radhe Garments'}" value="${esc(DB.settings.shopName || '')}">
+        </div>
+
+        <div>
+          <label class="cust-label" style="font-size:12px;font-weight:700">${t("mobile")} (10-Digit Mobile) *</label>
+          <input type="tel" id="mShopMobile" class="cust-inp" placeholder="e.g. 9826012345" value="${esc(DB.settings.mobile || '')}">
+        </div>
+
+        <div>
+          <label class="cust-label" style="font-size:12px;font-weight:700">${t("address")} (${isHi ? 'वैकल्पिक' : 'Optional'})</label>
+          <input type="text" id="mShopAddr" class="cust-inp" placeholder="${isHi ? 'उदा. मेन मार्केट' : 'e.g. Main Market'}" value="${esc(DB.settings.address || '')}">
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
+          <button type="button" class="btn main" id="btnSubmitCheckShop" style="background:#2563eb;color:#fff;border:none;border-radius:14px;padding:12px;font-weight:800;font-size:14px;box-shadow:0 4px 12px rgba(37,99,235,0.35);display:flex;align-items:center;justify-content:center;gap:8px">
+            <span>🔍</span>
+            <span>${isHi ? "चेक करें व दुकान लोड करें (Check & Connect)" : "Check & Connect Shop"}</span>
+          </button>
+          <button type="button" class="btn" id="btnSubmitNewCleanShop" style="background:#f0fdf4;color:#166534;border:1.5px solid #86efac;border-radius:14px;padding:12px;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px">
+            <span>➕</span>
+            <span>${isHi ? "नई दुकान बनाएं (0 सामान से शुरुआत)" : "Register New Shop (Clean 0 Items)"}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  const close = () => { modalHost.innerHTML = ""; };
+  $("#btnCloseShopModal").onclick = close;
+  $("#shopModalScrim").onclick = e => { if(e.target.id === "shopModalScrim") close(); };
+
+  $("#btnSubmitCheckShop").onclick = async () => {
+    const sName = $("#mShopName").value.trim();
+    const sMob = $("#mShopMobile").value.trim();
+    const sAddr = $("#mShopAddr").value.trim();
+    if(!sName && !sMob){
+      toast(isHi ? "दुकान का नाम या मोबाइल नंबर दर्ज करें" : "Enter shop name or mobile");
+      return;
+    }
+    close();
+    await lookupOrRegisterShop(sName, sMob, sAddr, false);
+  };
+
+  $("#btnSubmitNewCleanShop").onclick = async () => {
+    const sName = $("#mShopName").value.trim();
+    const sMob = $("#mShopMobile").value.trim();
+    const sAddr = $("#mShopAddr").value.trim();
+    if(!sName && !sMob){
+      toast(isHi ? "दुकान का नाम या मोबाइल नंबर दर्ज करें" : "Enter shop name or mobile");
+      return;
+    }
+    close();
+    await lookupOrRegisterShop(sName, sMob, sAddr, true);
+  };
 }
 
 LANG = DB.settings.lang || "en";
@@ -2055,6 +2229,19 @@ function renderShopFloor(){
   const isHi = LANG === "hi";
 
   $("#app").innerHTML = `<div class="stack">
+    <!-- SaaS Shop Identity Banner -->
+    <div style="display:flex;align-items:center;justify-content:space-between;background:#ffffff;padding:8px 12px;border-radius:14px;border:1px solid #e2e8f0;margin-bottom:8px;box-shadow:0 2px 6px rgba(0,0,0,0.03)">
+      <div style="display:flex;align-items:center;gap:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:700;color:#0f172a">
+        <span style="font-size:16px">🏪</span>
+        <span style="overflow:hidden;text-overflow:ellipsis">${esc(DB.settings.shopName || (isHi ? 'दुकान सेट नहीं है' : 'Shop Not Configured'))}</span>
+        ${DB.settings.mobile ? `<span style="color:#64748b;font-weight:600;font-size:12px">· 📱 ${esc(DB.settings.mobile)}</span>` : ''}
+      </div>
+      <button type="button" id="btnShopHeaderSwitch" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
+        <span>🔄</span>
+        <span>${DB.settings.shopName ? (isHi ? "दुकान बदलें" : "Switch Shop") : (isHi ? "लॉगिन / रजिस्टर" : "Login / Register")}</span>
+      </button>
+    </div>
+
     <!-- Hero Pastel Card (Screenshot 1) -->
     <div class="hero-card">
       <div class="hero-sub">${t("welcome")}</div>
@@ -2103,26 +2290,7 @@ function renderShopFloor(){
     </div>
 
     <div class="stack" id="itemsList">
-      ${filtered.length ? filtered.map(it => `
-        <div class="item-row">
-          <div class="item-row-left">
-            <div class="item-icon">${getCatIcon(it.cat)}</div>
-            <div>
-              <div class="item-title">${esc(it.name)}</div>
-              <div class="item-sub">
-                <span style="font-weight:700;color:#0f172a">${rs(it.rate)}</span>
-                <span>·</span>
-                <span>+${it.gst || 5}% GST</span>
-                ${it.hsn ? `<span>· HSN ${it.hsn}</span>` : ''}
-              </div>
-            </div>
-          </div>
-          <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-            <span class="pill primary" style="font-size:13px;font-weight:700;padding:4px 10px">${rs(it.rate)}</span>
-            <span style="font-size:11px;color:#64748b;font-weight:600">${esc(it.cat || 'Garment')}</span>
-          </div>
-        </div>
-      `).join("") : `<div style="text-align:center;padding:32px;color:var(--muted)">${t("noMatch")}</div>`}
+      ${renderCatalogItemsListHtml(filtered)}
     </div>
   </div>`;
 
@@ -2150,24 +2318,22 @@ function renderShopFloor(){
   const addCsvBtn = $("#btnShopAddCsv");
   if(addCsvBtn) addCsvBtn.onclick = () => go("inventory");
 
+  const shopSwitchBtn = $("#btnShopHeaderSwitch");
+  if(shopSwitchBtn) shopSwitchBtn.onclick = () => openShopSwitchModal();
+
+  const emptyBtn = $("#btnEmptyAddCsv");
+  if(emptyBtn) emptyBtn.onclick = () => go("inventory");
+
+  const emptyCheckBtn = $("#btnEmptyCheckShop");
+  if(emptyCheckBtn) emptyCheckBtn.onclick = () => openShopSwitchModal();
+
   renderCartBar();
 }
 
-/* Incremental items update: guarantees smooth typing without keyboard dismiss */
-function updateShopFloorItems(){
-  const q = SEARCH_QUERY.trim().toLowerCase();
-  const filtered = DB.items.filter(it => {
-    const matchCat = SELECTED_CAT === "All" || it.cat === SELECTED_CAT;
-    const matchQ = !q || it.name.toLowerCase().includes(q) || (it.cat && it.cat.toLowerCase().includes(q));
-    return matchCat && matchQ;
-  });
-
-  const catCount = $("#catalogCountBadge");
-  if(catCount) catCount.textContent = `(${filtered.length})`;
-
-  const list = $("#itemsList");
-  if(list){
-    list.innerHTML = filtered.length ? filtered.map(it => `
+function renderCatalogItemsListHtml(filtered){
+  const isHi = LANG === "hi";
+  if(filtered.length){
+    return filtered.map(it => `
       <div class="item-row">
         <div class="item-row-left">
           <div class="item-icon">${getCatIcon(it.cat)}</div>
@@ -2186,7 +2352,55 @@ function updateShopFloorItems(){
           <span style="font-size:11px;color:#64748b;font-weight:600">${esc(it.cat || 'Garment')}</span>
         </div>
       </div>
-    `).join("") : `<div style="text-align:center;padding:32px;color:var(--muted)">${t("noMatch")}</div>`;
+    `).join("");
+  }
+
+  // If store is completely empty (starting state with 0 items)
+  if(!DB.items || DB.items.length === 0){
+    return `<div style="text-align:center;padding:36px 16px;background:#ffffff;border-radius:20px;border:1.5px dashed #cbd5e1;margin-top:6px">
+      <div style="font-size:40px;margin-bottom:8px">🛍️</div>
+      <div style="font-size:16px;font-weight:800;color:#0f172a;margin-bottom:4px">
+        ${isHi ? "दुकान में अभी कोई सामान नहीं है" : "No Items in Catalog Yet"}
+      </div>
+      <div style="font-size:12px;color:#64748b;max-width:340px;margin:0 auto 16px;line-height:1.5">
+        ${isHi ? "कपड़े और रेट जोड़ने के लिए 'CSV से जोड़ें' का उपयोग करें या यदि आपकी दुकान पहले से रजिस्टर्ड है तो दुकान लॉगिन करें।" : "Upload items via CSV or connect your registered shop to restore your catalog."}
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button type="button" class="btn main" id="btnEmptyAddCsv" style="background:#16a34a;border:none;border-radius:12px;font-weight:800;padding:10px 20px;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(22,163,74,0.3)">
+          <span>📁</span>
+          <span>${isHi ? "CSV से सामान जोड़ें" : "Add Items via CSV"}</span>
+        </button>
+        <button type="button" class="btn" id="btnEmptyCheckShop" style="background:#eff6ff;color:#2563eb;border:1.5px solid #bfdbfe;border-radius:12px;font-weight:800;padding:10px 16px;display:inline-flex;align-items:center;gap:6px">
+          <span>🏢</span>
+          <span>${isHi ? "दुकान चेक / लॉगिन" : "Login Registered Shop"}</span>
+        </button>
+      </div>
+    </div>`;
+  }
+
+  // If search query didn't match
+  return `<div style="text-align:center;padding:32px;color:var(--muted)">${t("noMatch")}</div>`;
+}
+
+/* Incremental items update: guarantees smooth typing without keyboard dismiss */
+function updateShopFloorItems(){
+  const q = SEARCH_QUERY.trim().toLowerCase();
+  const filtered = DB.items.filter(it => {
+    const matchCat = SELECTED_CAT === "All" || it.cat === SELECTED_CAT;
+    const matchQ = !q || it.name.toLowerCase().includes(q) || (it.cat && it.cat.toLowerCase().includes(q));
+    return matchCat && matchQ;
+  });
+
+  const catCount = $("#catalogCountBadge");
+  if(catCount) catCount.textContent = `(${filtered.length})`;
+
+  const list = $("#itemsList");
+  if(list){
+    list.innerHTML = renderCatalogItemsListHtml(filtered);
+    const emptyBtn = $("#btnEmptyAddCsv");
+    if(emptyBtn) emptyBtn.onclick = () => go("inventory");
+    const emptyCheckBtn = $("#btnEmptyCheckShop");
+    if(emptyCheckBtn) emptyCheckBtn.onclick = () => openShopSwitchModal();
   }
 }
 
@@ -3687,6 +3901,31 @@ function renderSetup(){
   $("#app").innerHTML = `<div class="stack">
     <h2 style="font-size:22px;font-weight:800;margin:0 0 8px">${t("setup")}</h2>
 
+    <!-- SaaS Multi-Shop Account Card -->
+    <div class="card stack" style="box-shadow:0 4px 18px rgba(0,0,0,0.06);border-radius:20px;padding:18px;border:1.5px solid #bfdbfe;background:linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;color:#1e40af">
+          <span>🏢</span>
+          <span>${isHi ? "SaaS दुकान खाता (Multi-Shop Manager)" : "SaaS Shop Account (Multi-Shop)"}</span>
+        </div>
+        <span class="pill primary" style="font-size:11px;font-weight:800">${DB.items.length} ${isHi ? "सामान" : "Items"}</span>
+      </div>
+      <div style="font-size:13px;color:#334155;margin:4px 0 10px;line-height:1.5">
+        <strong>${isHi ? "सक्रिय दुकान:" : "Active Shop:"}</strong> ${esc(DB.settings.shopName || (isHi ? "कोई दुकान सेट नहीं है" : "None set"))}
+        ${DB.settings.mobile ? `· 📱 ${esc(DB.settings.mobile)}` : ''}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button type="button" class="btn" id="btnSaaSSwitchShop" style="background:#2563eb;color:#ffffff;border:none;border-radius:12px;font-weight:800;padding:10px;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 12px rgba(37,99,235,0.3)">
+          <span>🔄</span>
+          <span>${isHi ? "दुकान चेक / बदलें" : "Check / Switch Shop"}</span>
+        </button>
+        <button type="button" class="btn" id="btnSaaSNewShop" style="background:#f0fdf4;color:#166534;border:1.5px solid #86efac;border-radius:12px;font-weight:800;padding:10px;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px">
+          <span>➕</span>
+          <span>${isHi ? "नई दुकान (0 सामान)" : "New Shop (0 Items)"}</span>
+        </button>
+      </div>
+    </div>
+
     <form class="card stack" id="setupForm" style="box-shadow:0 4px 18px rgba(0,0,0,0.06);border-radius:20px;padding:20px">
       <div style="font-size:16px;font-weight:800;color:#0f172a;margin-bottom:2px;display:flex;align-items:center;gap:8px">
         <span>🏪</span>
@@ -3737,6 +3976,12 @@ function renderSetup(){
     </div>
   </div>`;
 
+  const btnSwitch = $("#btnSaaSSwitchShop");
+  if(btnSwitch) btnSwitch.onclick = () => openShopSwitchModal();
+
+  const btnNew = $("#btnSaaSNewShop");
+  if(btnNew) btnNew.onclick = () => openShopSwitchModal();
+
   const saveLiveSettings = () => {
     DB.settings.shopName = $("#sName").value.trim();
     DB.settings.address = $("#sAddr").value.trim();
@@ -3780,6 +4025,9 @@ function renderSetup(){
   $("#setupForm").onsubmit = e => {
     e.preventDefault();
     saveLiveSettings();
+    if(DB.settings.shopName && DB.settings.mobile){
+      lookupOrRegisterShop(DB.settings.shopName, DB.settings.mobile, DB.settings.address, false, true);
+    }
     toast(isHi ? "✅ दुकान की जानकारी सुरक्षित हो गई!" : "✅ Shop details saved successfully!");
   };
 

@@ -1,17 +1,56 @@
 const express = require('express');
 const cors = require('cors');
 
+const fs = require('fs');
+const path = require('path');
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
-// In-memory / persistent mock store for demo cloud sync
+const DB_FILE = path.join(__dirname, 'cloud_db.json');
+
+// In-memory + persistent disk store for SaaS multi-shop catalog sync
 const cloudSync = {
   backups: new Map(),
   invoices: new Map(),
+  shops: new Map(),
 };
+
+// Load saved data from disk if exists
+try {
+  if (fs.existsSync(DB_FILE)) {
+    const raw = fs.readFileSync(DB_FILE, 'utf8');
+    const parsed = JSON.parse(raw);
+    if (parsed.shops && Array.isArray(parsed.shops)) {
+      parsed.shops.forEach(s => cloudSync.shops.set(s.shopId, s));
+    }
+    if (parsed.backups && typeof parsed.backups === 'object') {
+      Object.entries(parsed.backups).forEach(([k, v]) => cloudSync.backups.set(k, v));
+    }
+    if (parsed.invoices && typeof parsed.invoices === 'object') {
+      Object.entries(parsed.invoices).forEach(([k, v]) => cloudSync.invoices.set(k, v));
+    }
+    console.log(`[KapdaBill SaaS] Loaded ${cloudSync.shops.size} registered shops from disk.`);
+  }
+} catch (e) {
+  console.warn('[KapdaBill SaaS] Warning: Could not read cloud_db.json:', e.message);
+}
+
+function saveDbToDisk() {
+  try {
+    const data = {
+      shops: Array.from(cloudSync.shops.values()),
+      backups: Object.fromEntries(cloudSync.backups),
+      invoices: Object.fromEntries(cloudSync.invoices)
+    };
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (e) {
+    console.warn('[KapdaBill SaaS] Warning: Could not write cloud_db.json:', e.message);
+  }
+}
 
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {
@@ -19,8 +58,71 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     service: 'Kapda Bill Backend API',
     uptime: process.uptime(),
+    registeredShops: cloudSync.shops.size,
     timestamp: new Date().toISOString()
   });
+});
+
+// SaaS Shop Lookup & Registration Endpoint
+app.post('/api/shops/lookup', (req, res) => {
+  const { shopName, mobile, address } = req.body;
+  if (!mobile && !shopName) {
+    return res.status(400).json({ error: 'Shop name or mobile number is required' });
+  }
+
+  const cleanPhone = mobile ? String(mobile).replace(/\D/g, '').slice(-10) : '';
+  const shopId = cleanPhone ? ('shop_' + cleanPhone) : ('shop_' + String(shopName).trim().toLowerCase().replace(/\s+/g, '_'));
+
+  // Dual Lookup: Check by mobile or by Shop Name
+  let existing = null;
+  if (cleanPhone && cloudSync.shops.has('shop_' + cleanPhone)) {
+    existing = cloudSync.shops.get('shop_' + cleanPhone);
+  } else if (shopName) {
+    const qName = String(shopName).trim().toLowerCase();
+    for (const s of cloudSync.shops.values()) {
+      if (s.shopName && s.shopName.toLowerCase() === qName) {
+        existing = s;
+        break;
+      }
+    }
+  }
+
+  if (existing) {
+    const backup = cloudSync.backups.get(existing.shopId);
+    return res.json({
+      exists: true,
+      shopId: existing.shopId,
+      shop: existing,
+      data: backup ? backup.data : null,
+      message: 'Shop already registered. Restoring catalog items.'
+    });
+  }
+
+  // Register brand new shop with clean slate (0 items)
+  const newShop = {
+    shopId,
+    shopName: shopName ? String(shopName).trim() : 'Bill Book Store',
+    mobile: cleanPhone || '',
+    address: address ? String(address).trim() : '',
+    createdAt: new Date().toISOString()
+  };
+  cloudSync.shops.set(shopId, newShop);
+  saveDbToDisk();
+
+  res.json({
+    exists: false,
+    isNew: true,
+    shopId,
+    shop: newShop,
+    data: null,
+    message: 'New shop registered successfully with clean catalog (0 items).'
+  });
+});
+
+// SaaS Admin Endpoint: List all registered shops
+app.get('/api/shops', (req, res) => {
+  const allShops = Array.from(cloudSync.shops.values());
+  res.json({ count: allShops.length, shops: allShops });
 });
 
 // CSV parser endpoint (handles CSV item lists if shopkeeper uploads to backend)
@@ -66,6 +168,7 @@ app.post('/api/backup/:shopId', (req, res) => {
     data: backupData,
     savedAt: new Date().toISOString()
   });
+  saveDbToDisk();
   res.json({ success: true, message: 'Backup saved to cloud', shopId });
 });
 
@@ -86,6 +189,7 @@ app.post('/api/invoices', (req, res) => {
   }
   cloudSync.invoices.set(bill.no, bill);
   if(bill.id) cloudSync.invoices.set(bill.id, bill);
+  saveDbToDisk();
   res.json({
     success: true,
     message: 'Invoice saved to cloud',
