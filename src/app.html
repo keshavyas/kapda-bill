@@ -2094,19 +2094,11 @@ function renderShopFloor(){
       ${cats.map(c => `<button type="button" class="cat-pill ${c === SELECTED_CAT ? 'active' : ''}" data-cat="${c}">${c === "All" ? t("all") : c}</button>`).join("")}
     </div>
 
-    <!-- Items List Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 4px;margin-top:4px">
-      <div style="font-size:13px;font-weight:800;color:#334155;display:flex;align-items:center;gap:6px">
+    <!-- Items List Header (Clean Title without duplicate buttons) -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 4px;margin-top:6px">
+      <div style="font-size:14px;font-weight:800;color:#1e293b;display:flex;align-items:center;gap:6px">
         <span>👗</span>
-        <span>${t("availableCatalog")} <span id="catalogCountBadge">(${filtered.length})</span></span>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <button type="button" class="btn sm" id="btnShopAddCsvSmall" style="background:#f0fdf4;color:#166534;font-weight:700;border:1px solid #86efac;border-radius:999px;padding:3px 10px;font-size:12px">
-          📁 ${isHi ? "CSV जोड़ें" : "Add CSV"}
-        </button>
-        <button type="button" class="btn sm" id="btnShopCreateBill" style="background:#eff6ff;color:#2563eb;font-weight:700;border:1px solid #bfdbfe;border-radius:999px;padding:3px 12px;font-size:12px">
-          🧾 ${t("createBillNow")}
-        </button>
+        <span>${t("availableCatalog")} <span id="catalogCountBadge" style="color:#64748b;font-weight:600">(${filtered.length})</span></span>
       </div>
     </div>
 
@@ -2155,14 +2147,8 @@ function renderShopFloor(){
   const heroBtn = $("#btnHeroCreateBill");
   if(heroBtn) heroBtn.onclick = () => openFinalInvoiceModal();
 
-  const shopBtn = $("#btnShopCreateBill");
-  if(shopBtn) shopBtn.onclick = () => openFinalInvoiceModal();
-
   const addCsvBtn = $("#btnShopAddCsv");
-  if(addCsvBtn) addCsvBtn.onclick = () => openCsvModal();
-
-  const addCsvSmallBtn = $("#btnShopAddCsvSmall");
-  if(addCsvSmallBtn) addCsvSmallBtn.onclick = () => openCsvModal();
+  if(addCsvBtn) addCsvBtn.onclick = () => go("inventory");
 
   renderCartBar();
 }
@@ -2202,87 +2188,6 @@ function updateShopFloorItems(){
       </div>
     `).join("") : `<div style="text-align:center;padding:32px;color:var(--muted)">${t("noMatch")}</div>`;
   }
-}
-
-/* ================= CSV INVENTORY POPUP MODAL ================= */
-function openCsvModal(){
-  const host = $("#overlayHost");
-  if(!host) return;
-
-  const isHi = LANG === "hi";
-
-  host.innerHTML = `
-    <div class="invoice-sheet-scrim" id="csvModalScrim" style="display:flex;align-items:center;justify-content:center;padding:16px;z-index:99999">
-      <div class="invoice-sheet" style="max-width:440px;width:100%;border-radius:24px;padding:24px 20px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 40px rgba(0,0,0,0.25);background:#ffffff">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:40px;height:40px;border-radius:12px;background:#f0fdf4;color:#16a34a;display:flex;align-items:center;justify-content:center;font-size:22px;border:1px solid #bbf7d0">📁</div>
-            <div>
-              <div style="font-weight:800;font-size:17px;color:#0f172a">${isHi ? "CSV से सामान जोड़ें" : "CSV Inventory Manager"}</div>
-              <div style="font-size:12px;color:#64748b">${isHi ? "Excel / CSV से सारे आइटम व रेट तुरंत जोड़ें" : "Import items & rates from CSV"}</div>
-            </div>
-          </div>
-          <button type="button" class="btn sm" id="btnCloseCsvModal" style="background:#f1f5f9;border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700">✕</button>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px">
-          <!-- Option 1: Download Sample CSV -->
-          <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px">
-            <div style="display:flex;align-items:center;gap:8px;font-weight:800;color:#0f172a;font-size:14px">
-              <span style="font-size:18px">📥</span>
-              <span>1. ${isHi ? "सैंपल CSV फ़ाइल डाउनलोड करें" : "Download Sample CSV File"}</span>
-            </div>
-            <div style="font-size:12px;color:#64748b;line-height:1.4">
-              ${isHi ? "कुर्ता, साड़ी, लहंगा, शर्ट आदि के नाम, रेट, HSN और GST टैक्स का रेडीमेड फ़ॉर्मेट।" : "Pre-formatted sample template with Kurtis, Sarees, Jeans, Shirts, HSN & GST."}
-            </div>
-            <button type="button" class="btn" id="btnModalSampleCsv" style="background:#ffffff;border:1.5px solid #cbd5e1;border-radius:12px;font-weight:700;color:#0f172a;min-height:42px;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px">
-              <span>📥</span>
-              <span>${isHi ? "सैंपल CSV डाउनलोड करें" : "Download Sample Template"}</span>
-            </button>
-          </div>
-
-          <!-- Option 2: Upload CSV -->
-          <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px">
-            <div style="display:flex;align-items:center;gap:8px;font-weight:800;color:#166534;font-size:14px">
-              <span style="font-size:18px">📁</span>
-              <span>2. ${isHi ? "अपनी CSV फ़ाइल अपलोड करें" : "Upload Your CSV File"}</span>
-            </div>
-            <div style="font-size:12px;color:#15803d;line-height:1.4">
-              ${isHi ? "फ़ाइल चुनते ही सारे आइटम और उनके रेट दुकान की लिस्ट में जुड़ जाएँगे।" : "Items and rates from your CSV will be added directly into your catalog."}
-            </div>
-            <input type="file" id="modalCsvFileInput" accept=".csv,text/csv" hidden>
-            <button type="button" class="btn main" id="btnModalUploadCsv" style="background:#16a34a;border:none;border-radius:12px;font-weight:800;color:#ffffff;min-height:44px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 12px rgba(22,163,74,0.3);margin-top:4px">
-              <span>📁</span>
-              <span>${isHi ? "CSV फ़ाइल चुनें (Upload CSV)" : "Select CSV File to Upload"}</span>
-            </button>
-          </div>
-        </div>
-
-        <div style="margin-top:14px;padding:12px;background:#f8fafc;border-radius:14px;display:flex;align-items:center;justify-content:space-between">
-          <span style="font-size:12px;color:#64748b;font-weight:600">${isHi ? "वर्तमान में उपलब्ध कुल सामान:" : "Current Catalog Items:"}</span>
-          <span style="font-size:13px;font-weight:800;color:#0f172a" id="modalCurrentItemCount">${DB.items.length} ${isHi ? "सामान" : "items"}</span>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const close = () => { host.innerHTML = ""; };
-  $("#btnCloseCsvModal").onclick = close;
-  $("#csvModalScrim").onclick = e => { if(e.target.id === "csvModalScrim") close(); };
-
-  $("#btnModalSampleCsv").onclick = downloadSampleCsvFile;
-
-  const fileInp = $("#modalCsvFileInput");
-  $("#btnModalUploadCsv").onclick = () => fileInp.click();
-
-  fileInp.onchange = e => {
-    if(e.target.files.length){
-      parseAndImportCsv(e.target.files[0], () => {
-        close();
-        renderShopFloor();
-      });
-    }
-  };
 }
 
 function getCatIcon(cat){
@@ -3611,21 +3516,73 @@ function renderBills(){
 
 /* ================= INVENTORY & CSV UPLOAD VIEW ================= */
 function renderInventory(){
+  const isHi = LANG === "hi";
+
   $("#app").innerHTML = `<div class="stack">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <h2 style="font-size:22px;font-weight:800;margin:0">${t("inventory")}</h2>
-      <div class="row">
-        <button type="button" class="btn sm" id="btnSampleCsv">📥 ${t("sampleCsv")}</button>
-        <button type="button" class="btn main sm" id="btnUploadCsv">📁 ${t("uploadCsv")}</button>
+    <!-- Top Return Bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <button type="button" class="btn sm" id="btnBackToShop" style="background:#ffffff;border:1.5px solid #cbd5e1;border-radius:12px;font-weight:700;color:#334155;padding:6px 14px;display:flex;align-items:center;gap:6px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        <span>${isHi ? "दुकान (Shop Floor)" : "Back to Shop"}</span>
+      </button>
+      <div style="font-size:13px;font-weight:800;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;padding:4px 12px;border-radius:999px">
+        📁 ${isHi ? "CSV इन्वेंटरी" : "CSV Manager"}
       </div>
     </div>
 
-    <!-- Drag & Drop Zone -->
-    <div class="dropzone" id="csvDropArea">
-      <div style="font-size:24px;margin-bottom:4px">📁</div>
-      <div style="font-weight:700;font-size:15px">${t("uploadCsv")}</div>
-      <div class="small muted" style="margin-top:2px">Drag & drop CSV file or tap to browse</div>
-      <input type="file" id="csvFileInput" accept=".csv,text/csv" hidden>
+    <!-- Screen Title -->
+    <div>
+      <h2 style="font-size:22px;font-weight:800;margin:0 0 4px;color:#0f172a">${isHi ? "CSV से सामान जोड़ें" : "CSV Inventory Manager"}</h2>
+      <div class="small muted" style="color:#64748b;font-size:13px">
+        ${isHi ? "Excel या CSV फ़ाइल से अपनी दुकान के सारे कपड़े, रेट और टैक्स आसानी से जोड़ें।" : "Import clothing items, rates, and GST into your shop from an Excel or CSV file."}
+      </div>
+    </div>
+
+    <!-- 2 Clear Action Cards -->
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px">
+      <!-- Card 1: Download Sample CSV -->
+      <div class="card stack" style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:18px;padding:18px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:40px;height:40px;border-radius:12px;background:#ffffff;border:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center;font-size:20px">📥</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:#0f172a">1. ${isHi ? "सैंपल CSV डाउनलोड करें" : "Download Sample CSV"}</div>
+            <div style="font-size:12px;color:#64748b;margin-top:2px">
+              ${isHi ? "कुर्ता, साड़ी, लहंगा, शर्ट आदि के नाम, रेट, HSN और GST का रेडीमेड फ़ॉर्मेट।" : "Pre-formatted template with Kurtis, Sarees, Jeans, Shirts, HSN codes & GST rates."}
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn" id="btnSampleCsv" style="background:#ffffff;border:1.5px solid #cbd5e1;border-radius:12px;font-weight:700;color:#0f172a;min-height:44px;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px">
+          <span>📥</span>
+          <span>${isHi ? "सैंपल CSV डाउनलोड करें (Download Template)" : "Download Sample Template"}</span>
+        </button>
+      </div>
+
+      <!-- Card 2: Upload CSV -->
+      <div class="card stack" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:18px;padding:18px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:40px;height:40px;border-radius:12px;background:#ffffff;border:1px solid #86efac;display:flex;align-items:center;justify-content:center;font-size:20px">📁</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:#166534">2. ${isHi ? "अपनी CSV फ़ाइल अपलोड करें" : "Upload Your CSV File"}</div>
+            <div style="font-size:12px;color:#15803d;margin-top:2px">
+              ${isHi ? "फ़ाइल चुनते ही सारे आइटम और उनके रेट दुकान की लिस्ट में जुड़ जाएँगे।" : "Items and rates from your CSV will be added directly into your store catalog."}
+            </div>
+          </div>
+        </div>
+
+        <input type="file" id="csvFileInput" accept=".csv,text/csv" hidden>
+        <button type="button" class="btn main" id="btnUploadCsv" style="background:#16a34a;border:none;border-radius:12px;font-weight:800;color:#ffffff;min-height:46px;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;box-shadow:0 4px 12px rgba(22,163,74,0.3)">
+          <span>📁</span>
+          <span>${isHi ? "CSV फ़ाइल चुनें (Upload CSV)" : "Select CSV File to Upload"}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Items Currently in Catalog -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 4px 0;margin-top:8px">
+      <div style="font-size:14px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:6px">
+        <span>👗</span>
+        <span>${isHi ? "दुकान में कुल सामान" : "Current Store Items"} (${DB.items.length})</span>
+      </div>
     </div>
 
     <div class="stack" id="invItemsList">
@@ -3649,23 +3606,17 @@ function renderInventory(){
     </div>
   </div>`;
 
-  const drop = $("#csvDropArea");
+  $("#btnBackToShop").onclick = () => go("home");
+
   const fileInp = $("#csvFileInput");
-  drop.onclick = () => fileInp.click();
-
-  drop.ondragover = e => { e.preventDefault(); drop.classList.add("dragover"); };
-  drop.ondragleave = () => drop.classList.remove("dragover");
-  drop.ondrop = e => {
-    e.preventDefault();
-    drop.classList.remove("dragover");
-    if(e.dataTransfer.files.length) parseAndImportCsv(e.dataTransfer.files[0]);
-  };
-  fileInp.onchange = e => {
-    if(e.target.files.length) parseAndImportCsv(e.target.files[0]);
-  };
-
   $("#btnUploadCsv").onclick = () => fileInp.click();
   $("#btnSampleCsv").onclick = downloadSampleCsvFile;
+
+  fileInp.onchange = e => {
+    if(e.target.files.length){
+      parseAndImportCsv(e.target.files[0], () => renderInventory());
+    }
+  };
 
   document.querySelectorAll("[data-del-item]").forEach(b => {
     b.onclick = () => {
