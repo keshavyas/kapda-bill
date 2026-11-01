@@ -1,6 +1,6 @@
 {
- "name": "कपड़ा बिल - Kapda Bill Pro",
- "short_name": "कपड़ा बिल",
+ "name": "Bill Book",
+ "short_name": "Bill Book",
  "start_url": "./index.html",
  "scope": "./",
  "display": "standalone",

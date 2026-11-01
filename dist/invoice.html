@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Tax Invoice - Kapda Bill Pro</title>
+  <title>Tax Invoice - Bill Book</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -230,7 +230,7 @@
 <div class="top-bar">
   <div class="top-title">
     <span>🛍️</span>
-    <span id="topShopName">Kapda Bill</span>
+    <span id="topShopName">Bill Book</span>
   </div>
   <span style="font-size:12px;font-weight:700;color:var(--emerald);background:#d1fae5;padding:4px 10px;border-radius:999px">✓ Verified Invoice</span>
 </div>
@@ -345,7 +345,7 @@ const bill = parseBillData() || {
 };
 
 // Render Bill
-document.getElementById("topShopName").textContent = bill.shop.shopName || "Kapda Bill";
+document.getElementById("topShopName").textContent = bill.shop.shopName || "Bill Book";
 document.getElementById("shopName").textContent = bill.shop.shopName || "Kalyani Boutique";
 document.getElementById("shopAddress").textContent = bill.shop.address || "";
 document.getElementById("shopContact").textContent = bill.shop.mobile ? "Phone: +91 " + bill.shop.mobile : "";

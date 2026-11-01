@@ -51,7 +51,7 @@ jobs:
       - name: Upload APK as GitHub Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: kapda-bill-android-apk
+          name: bill-book-android-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
@@ -61,9 +61,9 @@ jobs:
         continue-on-error: true
         with:
           tag_name: latest-apk
-          name: "Kapda Bill Pro - Android App (APK)"
+          name: "Bill Book - Android App (APK)"
           body: |
-            ## 📲 Kapda Bill Pro - Android APK Download
+            ## 📲 Bill Book - Android APK Download
             Direct APK compiled automatically via GitHub Actions (no Android Studio required).
             
             ### How to Install:

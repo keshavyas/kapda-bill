@@ -1,6 +1,6 @@
 {
   "appId": "com.kapdabill.app",
-  "appName": "Kalyani Boutique - Kapda Bill Pro",
+  "appName": "Bill Book",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"

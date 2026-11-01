@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">कपड़ा बिल - Kapda Bill Pro</string>
-    <string name="title_activity_main">कपड़ा बिल - Kapda Bill Pro</string>
+    <string name="app_name">Bill Book</string>
+    <string name="title_activity_main">Bill Book</string>
     <string name="package_name">com.kapdabill.app</string>
     <string name="custom_url_scheme">com.kapdabill.app</string>
 </resources>

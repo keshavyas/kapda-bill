@@ -13,7 +13,7 @@
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
 </head>
 <body>
-<title>Kapda Bill Pro</title>
+<title>Bill Book</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1935,7 +1935,7 @@ function updateHeader(){
   } else {
     logoBadge.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`;
   }
-  shopTitle.textContent = s.shopName || "Kapda Bill";
+  shopTitle.textContent = s.shopName || "Bill Book";
 
   // Language toggle buttons
   const btnEn = $("#btnEn"), btnHi = $("#btnHi");
@@ -3035,7 +3035,7 @@ function canvasToPdfBlob(cv, title){
   const content = `q ${f(wPt)} 0 0 ${f(hPt)} 0 0 cm /Im0 Do Q`;
   obj(5, `<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
   const safeTitle = String(title).replace(/[^\x20-\x7E]/g, "").replace(/[()\\]/g, "");
-  obj(6, `<< /Title (${safeTitle}) /Producer (Kapda Bill Pro) >>`);
+  obj(6, `<< /Title (${safeTitle}) /Producer (Bill Book) >>`);
   const xref = len;
   add("xref\n0 7\n0000000000 65535 f \n");
   for(let i = 1; i <= 6; i++) add(String(offs[i]).padStart(10, "0") + " 00000 n \n");
