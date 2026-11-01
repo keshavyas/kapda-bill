@@ -3067,7 +3067,10 @@ function formatWhatsAppText(b){
       shop: { shopName: b.shop.shopName, address: b.shop.address, mobile: b.shop.mobile, gstin: b.shop.gstin, thanks: b.shop.thanks }
     };
     const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(compactBill))));
-    const base = (window.location.origin + window.location.pathname).replace(/\/index\.html$/, "").replace(/\/$/, "");
+    let base = (window.location.origin + window.location.pathname).replace(/\/index\.html$/, "").replace(/\/$/, "");
+    if(!base.startsWith("http") || base.includes("localhost") || base.includes("capacitor:")){
+      base = "https://bill-book-rose-zeta.vercel.app";
+    }
     const invoiceLink = base + "/invoice.html#b=" + b64;
     lines.push("📥 *DOWNLOAD / VIEW OFFICIAL PDF INVOICE:*");
     lines.push("👉 " + invoiceLink);
