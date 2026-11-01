@@ -1,0 +1,22 @@
+{
+  "name": "kapda-bill-pro",
+  "version": "1.0.0",
+  "description": "Mobile billing & WhatsApp invoicing app for clothing retail shops",
+  "scripts": {
+    "build": "python3 build.py",
+    "serve": "python3 -m http.server 8080 --directory dist",
+    "cap:add": "npx @capacitor/cli add android",
+    "cap:sync": "npx @capacitor/cli sync android",
+    "cap:open": "npx @capacitor/cli open android",
+    "cap:build": "npx @capacitor/cli build android"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  },
+  "dependencies": {
+    "@capacitor/filesystem": "^6.0.4",
+    "@capacitor/share": "^6.0.4"
+  }
+}

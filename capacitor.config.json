@@ -1,0 +1,12 @@
+{
+  "appId": "com.kapdabill.app",
+  "appName": "Kalyani Boutique - Kapda Bill Pro",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#f8fafc",
+    "allowMixedContent": true
+  }
+}
