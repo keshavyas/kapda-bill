@@ -1637,7 +1637,7 @@ button:active, .btn:active, .pay-chip:active, .cat-pill:active, .dock-tab:active
     <div class="logo-badge" id="logoBadge">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
     </div>
-    <h1 id="shopTitle">Kalyani Boutique</h1>
+    <h1 id="shopTitle">Bill Book</h1>
   </div>
   <!-- Exact Language Pill (Screenshot 1) -->
   <div class="lang-toggle" role="group" aria-label="Language">
@@ -1862,17 +1862,17 @@ function defaultDB(){
   return {
     app: "kapdabill_pro",
     settings: {
-      shopName: "Kalyani Boutique",
-      address: "Main Market, Fashion Street",
-      mobile: "9876543210",
+      shopName: "Bill Book",
+      address: "",
+      mobile: "",
       logo: "",
       thanks: "Thank you for shopping with us! Visit again.",
       footer: "Exchange within 7 days with bill.",
-      prefix: "KB/",
+      prefix: "BILL/",
       seq: 1,
       lang: "en",
       gstMode: "regular",
-      gstin: "23AABCU9603R1ZM"
+      gstin: ""
     },
     items: INITIAL_ITEMS,
     bills: [],
@@ -1894,6 +1894,11 @@ try {
     const parsed = JSON.parse(raw);
     DB = Object.assign({}, defaultDB(), parsed);
     if(parsed.settings) DB.settings = Object.assign({}, defaultDB().settings, parsed.settings);
+    // Migrate any legacy placeholder defaults to blank so shopkeeper starts fresh
+    if(DB.settings.shopName === "Kalyani Boutique") DB.settings.shopName = "Bill Book";
+    if(DB.settings.mobile === "9876543210") DB.settings.mobile = "";
+    if(DB.settings.address === "Main Market, Fashion Street") DB.settings.address = "";
+    if(DB.settings.gstin === "23AABCU9603R1ZM") DB.settings.gstin = "";
     if(!Array.isArray(DB.items) || !DB.items.length) DB.items = INITIAL_ITEMS;
   }
 } catch(e){}
@@ -2054,13 +2059,15 @@ function renderShopFloor(){
   // Extract Categories
   const cats = ["All", ...new Set(DB.items.map(i => i.cat).filter(Boolean))];
 
-  // Filter items
+  // Initial Filtered items
   const q = SEARCH_QUERY.trim().toLowerCase();
   const filtered = DB.items.filter(it => {
     const matchCat = SELECTED_CAT === "All" || it.cat === SELECTED_CAT;
     const matchQ = !q || it.name.toLowerCase().includes(q) || (it.cat && it.cat.toLowerCase().includes(q));
     return matchCat && matchQ;
   });
+
+  const isHi = LANG === "hi";
 
   $("#app").innerHTML = `<div class="stack">
     <!-- Hero Pastel Card (Screenshot 1) -->
@@ -2077,32 +2084,45 @@ function renderShopFloor(){
           <div class="hero-stat-val">${todayBills.length}</div>
         </div>
       </div>
-      <button type="button" class="btn main" id="btnHeroCreateBill" style="width:100%;margin-top:14px;border-radius:14px;font-weight:800;font-size:15px;background:#2563eb;color:#ffffff;box-shadow:0 4px 14px rgba(37,99,235,0.35);border:none;min-height:48px">
-        <span style="font-size:18px">🧾</span>
-        <span>${t("createBillNow")}</span>
-      </button>
+
+      <!-- Action Row: Create Bill Now & Add CSV Side-by-Side -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+        <button type="button" class="btn main" id="btnHeroCreateBill" style="border-radius:14px;font-weight:800;font-size:14px;background:#2563eb;color:#ffffff;box-shadow:0 4px 12px rgba(37,99,235,0.3);border:none;min-height:46px;display:flex;align-items:center;justify-content:center;gap:6px">
+          <span style="font-size:16px">🧾</span>
+          <span>${t("createBillNow")}</span>
+        </button>
+        <button type="button" class="btn" id="btnShopAddCsv" style="border-radius:14px;font-weight:800;font-size:14px;background:#f0fdf4;color:#166534;border:1.5px solid #86efac;box-shadow:0 2px 8px rgba(22,101,52,0.1);min-height:46px;display:flex;align-items:center;justify-content:center;gap:6px">
+          <span style="font-size:16px">📁</span>
+          <span>${isHi ? "CSV से जोड़ें" : "Add CSV"}</span>
+        </button>
+      </div>
     </div>
 
-    <!-- Search Input (Screenshot 1) -->
+    <!-- Search Input (Focus preserved smoothly on typing / deleting) -->
     <div class="search-box">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="search" class="search-inp" id="itemSearch" placeholder="${t("searchPlaceholder")}" value="${esc(SEARCH_QUERY)}">
     </div>
 
-    <!-- Category Filter Pills (Screenshot 1) -->
-    <div class="cat-scroll">
+    <!-- Category Filter Pills -->
+    <div class="cat-scroll" id="catScrollContainer">
       ${cats.map(c => `<button type="button" class="cat-pill ${c === SELECTED_CAT ? 'active' : ''}" data-cat="${c}">${c === "All" ? t("all") : c}</button>`).join("")}
     </div>
 
-    <!-- Items List (Clean Catalog Display - Showcase Only) -->
+    <!-- Items List Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 4px;margin-top:4px">
       <div style="font-size:13px;font-weight:800;color:#334155;display:flex;align-items:center;gap:6px">
         <span>👗</span>
-        <span>${t("availableCatalog")} (${filtered.length})</span>
+        <span>${t("availableCatalog")} <span id="catalogCountBadge">(${filtered.length})</span></span>
       </div>
-      <button type="button" class="btn sm" id="btnShopCreateBill" style="background:#eff6ff;color:#2563eb;font-weight:700;border:1px solid #bfdbfe;border-radius:999px;padding:3px 12px;font-size:12px">
-        🧾 ${t("createBillNow")}
-      </button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button type="button" class="btn sm" id="btnShopAddCsvSmall" style="background:#f0fdf4;color:#166534;font-weight:700;border:1px solid #86efac;border-radius:999px;padding:3px 10px;font-size:12px">
+          📁 ${isHi ? "CSV जोड़ें" : "Add CSV"}
+        </button>
+        <button type="button" class="btn sm" id="btnShopCreateBill" style="background:#eff6ff;color:#2563eb;font-weight:700;border:1px solid #bfdbfe;border-radius:999px;padding:3px 12px;font-size:12px">
+          🧾 ${t("createBillNow")}
+        </button>
+      </div>
     </div>
 
     <div class="stack" id="itemsList">
@@ -2129,16 +2149,21 @@ function renderShopFloor(){
     </div>
   </div>`;
 
-  // Bind Events
-  $("#itemSearch").oninput = e => {
-    SEARCH_QUERY = e.target.value;
-    renderShopFloor();
-  };
+  // Bind Search Event - Never rebuilds the input element, keeping keyboard & cursor 100% active!
+  const searchInp = $("#itemSearch");
+  if(searchInp){
+    searchInp.oninput = e => {
+      SEARCH_QUERY = e.target.value;
+      updateShopFloorItems();
+    };
+  }
 
+  // Bind Category Pills
   document.querySelectorAll(".cat-pill").forEach(b => {
     b.onclick = () => {
       SELECTED_CAT = b.dataset.cat;
-      renderShopFloor();
+      document.querySelectorAll(".cat-pill").forEach(p => p.classList.toggle("active", p.dataset.cat === SELECTED_CAT));
+      updateShopFloorItems();
     };
   });
 
@@ -2147,6 +2172,133 @@ function renderShopFloor(){
 
   const shopBtn = $("#btnShopCreateBill");
   if(shopBtn) shopBtn.onclick = () => openFinalInvoiceModal();
+
+  const addCsvBtn = $("#btnShopAddCsv");
+  if(addCsvBtn) addCsvBtn.onclick = () => openCsvModal();
+
+  const addCsvSmallBtn = $("#btnShopAddCsvSmall");
+  if(addCsvSmallBtn) addCsvSmallBtn.onclick = () => openCsvModal();
+
+  renderCartBar();
+}
+
+/* Incremental items update: guarantees smooth typing without keyboard dismiss */
+function updateShopFloorItems(){
+  const q = SEARCH_QUERY.trim().toLowerCase();
+  const filtered = DB.items.filter(it => {
+    const matchCat = SELECTED_CAT === "All" || it.cat === SELECTED_CAT;
+    const matchQ = !q || it.name.toLowerCase().includes(q) || (it.cat && it.cat.toLowerCase().includes(q));
+    return matchCat && matchQ;
+  });
+
+  const catCount = $("#catalogCountBadge");
+  if(catCount) catCount.textContent = `(${filtered.length})`;
+
+  const list = $("#itemsList");
+  if(list){
+    list.innerHTML = filtered.length ? filtered.map(it => `
+      <div class="item-row">
+        <div class="item-row-left">
+          <div class="item-icon">${getCatIcon(it.cat)}</div>
+          <div>
+            <div class="item-title">${esc(it.name)}</div>
+            <div class="item-sub">
+              <span style="font-weight:700;color:#0f172a">${rs(it.rate)}</span>
+              <span>·</span>
+              <span>+${it.gst || 5}% GST</span>
+              ${it.hsn ? `<span>· HSN ${it.hsn}</span>` : ''}
+            </div>
+          </div>
+        </div>
+        <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <span class="pill primary" style="font-size:13px;font-weight:700;padding:4px 10px">${rs(it.rate)}</span>
+          <span style="font-size:11px;color:#64748b;font-weight:600">${esc(it.cat || 'Garment')}</span>
+        </div>
+      </div>
+    `).join("") : `<div style="text-align:center;padding:32px;color:var(--muted)">${t("noMatch")}</div>`;
+  }
+}
+
+/* ================= CSV INVENTORY POPUP MODAL ================= */
+function openCsvModal(){
+  const host = $("#overlayHost");
+  if(!host) return;
+
+  const isHi = LANG === "hi";
+
+  host.innerHTML = `
+    <div class="invoice-sheet-scrim" id="csvModalScrim" style="display:flex;align-items:center;justify-content:center;padding:16px;z-index:99999">
+      <div class="invoice-sheet" style="max-width:440px;width:100%;border-radius:24px;padding:24px 20px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 40px rgba(0,0,0,0.25);background:#ffffff">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:40px;height:40px;border-radius:12px;background:#f0fdf4;color:#16a34a;display:flex;align-items:center;justify-content:center;font-size:22px;border:1px solid #bbf7d0">📁</div>
+            <div>
+              <div style="font-weight:800;font-size:17px;color:#0f172a">${isHi ? "CSV से सामान जोड़ें" : "CSV Inventory Manager"}</div>
+              <div style="font-size:12px;color:#64748b">${isHi ? "Excel / CSV से सारे आइटम व रेट तुरंत जोड़ें" : "Import items & rates from CSV"}</div>
+            </div>
+          </div>
+          <button type="button" class="btn sm" id="btnCloseCsvModal" style="background:#f1f5f9;border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700">✕</button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px">
+          <!-- Option 1: Download Sample CSV -->
+          <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;font-weight:800;color:#0f172a;font-size:14px">
+              <span style="font-size:18px">📥</span>
+              <span>1. ${isHi ? "सैंपल CSV फ़ाइल डाउनलोड करें" : "Download Sample CSV File"}</span>
+            </div>
+            <div style="font-size:12px;color:#64748b;line-height:1.4">
+              ${isHi ? "कुर्ता, साड़ी, लहंगा, शर्ट आदि के नाम, रेट, HSN और GST टैक्स का रेडीमेड फ़ॉर्मेट।" : "Pre-formatted sample template with Kurtis, Sarees, Jeans, Shirts, HSN & GST."}
+            </div>
+            <button type="button" class="btn" id="btnModalSampleCsv" style="background:#ffffff;border:1.5px solid #cbd5e1;border-radius:12px;font-weight:700;color:#0f172a;min-height:42px;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px">
+              <span>📥</span>
+              <span>${isHi ? "सैंपल CSV डाउनलोड करें" : "Download Sample Template"}</span>
+            </button>
+          </div>
+
+          <!-- Option 2: Upload CSV -->
+          <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;font-weight:800;color:#166534;font-size:14px">
+              <span style="font-size:18px">📁</span>
+              <span>2. ${isHi ? "अपनी CSV फ़ाइल अपलोड करें" : "Upload Your CSV File"}</span>
+            </div>
+            <div style="font-size:12px;color:#15803d;line-height:1.4">
+              ${isHi ? "फ़ाइल चुनते ही सारे आइटम और उनके रेट दुकान की लिस्ट में जुड़ जाएँगे।" : "Items and rates from your CSV will be added directly into your catalog."}
+            </div>
+            <input type="file" id="modalCsvFileInput" accept=".csv,text/csv" hidden>
+            <button type="button" class="btn main" id="btnModalUploadCsv" style="background:#16a34a;border:none;border-radius:12px;font-weight:800;color:#ffffff;min-height:44px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 12px rgba(22,163,74,0.3);margin-top:4px">
+              <span>📁</span>
+              <span>${isHi ? "CSV फ़ाइल चुनें (Upload CSV)" : "Select CSV File to Upload"}</span>
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;padding:12px;background:#f8fafc;border-radius:14px;display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:12px;color:#64748b;font-weight:600">${isHi ? "वर्तमान में उपलब्ध कुल सामान:" : "Current Catalog Items:"}</span>
+          <span style="font-size:13px;font-weight:800;color:#0f172a" id="modalCurrentItemCount">${DB.items.length} ${isHi ? "सामान" : "items"}</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const close = () => { host.innerHTML = ""; };
+  $("#btnCloseCsvModal").onclick = close;
+  $("#csvModalScrim").onclick = e => { if(e.target.id === "csvModalScrim") close(); };
+
+  $("#btnModalSampleCsv").onclick = downloadSampleCsvFile;
+
+  const fileInp = $("#modalCsvFileInput");
+  $("#btnModalUploadCsv").onclick = () => fileInp.click();
+
+  fileInp.onchange = e => {
+    if(e.target.files.length){
+      parseAndImportCsv(e.target.files[0], () => {
+        close();
+        renderShopFloor();
+      });
+    }
+  };
+}
 
   renderCartBar();
 }
@@ -2902,12 +3054,19 @@ function renderInvoiceCanvas(b){
   // Shop Name & Details
   ctx.font = '800 24px "Plus Jakarta Sans", sans-serif';
   ctx.fillStyle = "#0f172a";
-  ctx.fillText(b.shop.shopName || "Kalyani Boutique", 32, 50);
+  const shopObj = b.shop || DB.settings;
+  const sName = shopObj.shopName || DB.settings.shopName || "Bill Book";
+  ctx.fillText(sName, 32, 50);
 
   ctx.font = '500 13px "Plus Jakarta Sans", sans-serif';
   ctx.fillStyle = "#64748b";
-  ctx.fillText(b.shop.address || "Main Market", 32, 74);
-  ctx.fillText("Phone: " + (b.shop.mobile || "") + (b.shop.gstin ? "  ·  GSTIN: " + b.shop.gstin : ""), 32, 94);
+  const sAddr = shopObj.address || DB.settings.address || "";
+  if(sAddr) ctx.fillText(sAddr, 32, 74);
+  const sMob = shopObj.mobile || DB.settings.mobile || "";
+  const sGst = shopObj.gstin || DB.settings.gstin || "";
+  let contactStr = sMob ? ("Phone: +91 " + sMob) : "";
+  if(sGst) contactStr += (contactStr ? "  ·  " : "") + "GSTIN: " + sGst;
+  if(contactStr) ctx.fillText(contactStr, 32, sAddr ? 94 : 74);
 
   // Invoice Title
   ctx.font = '800 14px "Plus Jakarta Sans", sans-serif';
@@ -3045,8 +3204,15 @@ function canvasToPdfBlob(cv, title){
 
 function formatWhatsAppText(b){
   const lines = [];
-  lines.push("🛍️ *" + (b.shop.shopName || "Kalyani Boutique") + "*");
-  if(b.shop.address) lines.push(b.shop.address);
+  const shopObj = b.shop || DB.settings;
+  const sName = shopObj.shopName || DB.settings.shopName || "Bill Book";
+  lines.push("🛍️ *" + sName + "*");
+  const sAddr = shopObj.address || DB.settings.address;
+  if(sAddr) lines.push(sAddr);
+  const sMob = shopObj.mobile || DB.settings.mobile;
+  if(sMob) lines.push("📞 Shop Mobile: +91 " + sMob);
+  const sGst = shopObj.gstin || DB.settings.gstin;
+  if(sGst) lines.push("🏛️ GSTIN: " + sGst);
   lines.push("━━━━━━━━━━━━━━━━━━━━");
   lines.push("📄 *TAX INVOICE #" + b.no + "*");
   lines.push("📅 " + dmy(b.date) + " · " + hm(b.date));
@@ -3528,35 +3694,43 @@ function renderInventory(){
   });
 }
 
-function parseAndImportCsv(file){
+function parseAndImportCsv(file, onDone){
   const rd = new FileReader();
   rd.onload = e => {
     const lines = e.target.result.split(/\r?\n/).filter(l => l.trim().length > 0);
     if(lines.length <= 1){
-      toast("No items found in CSV");
+      toast(LANG === "hi" ? "CSV फ़ाइल में कोई सामान नहीं मिला" : "No items found in CSV");
       return;
     }
     const header = lines[0].split(",").map(c => c.trim().toLowerCase());
-    let nameIdx = header.findIndex(h => h.includes("name") || h.includes("item") || h.includes("सामान"));
+    let nameIdx = header.findIndex(h => h.includes("name") || h.includes("item") || h.includes("सामान") || h.includes("कपड़ा"));
     if(nameIdx === -1) nameIdx = 0;
-    let rateIdx = header.findIndex(h => h.includes("rate") || h.includes("price") || h.includes("रेट"));
+    let catIdx = header.findIndex(h => h.includes("cat") || h.includes("टाइप") || h.includes("श्रेणी"));
+    let rateIdx = header.findIndex(h => h.includes("rate") || h.includes("price") || h.includes("रेट") || h.includes("कीमत") || h.includes("mrp"));
     let hsnIdx = header.findIndex(h => h.includes("hsn"));
-    let gstIdx = header.findIndex(h => h.includes("gst"));
+    let gstIdx = header.findIndex(h => h.includes("gst") || h.includes("टैक्स"));
 
     let added = 0;
     for(let i = 1; i < lines.length; i++){
       const cols = lines[i].split(",").map(c => c.trim().replace(/^["']|["']$/g, ""));
       const name = cols[nameIdx];
       if(!name) continue;
-      const rate = rateIdx !== -1 && Number(cols[rateIdx]) ? Number(cols[rateIdx]) : 500;
-      const hsn = hsnIdx !== -1 ? cols[hsnIdx] : "";
-      const gst = gstIdx !== -1 ? Number(cols[gstIdx]) || 5 : 5;
-      DB.items.push({ id: uid(), name, cat: "Other", rate, gst, hsn });
+      const cat = (catIdx !== -1 && cols[catIdx]) ? cols[catIdx] : "Garment";
+      const rate = (rateIdx !== -1 && Number(cols[rateIdx]) && Number(cols[rateIdx]) > 0) ? Number(cols[rateIdx]) : 500;
+      const hsn = hsnIdx !== -1 ? cols[hsnIdx] : "6204";
+      const gst = (gstIdx !== -1 && !isNaN(Number(cols[gstIdx]))) ? Number(cols[gstIdx]) : 5;
+      DB.items.push({ id: uid(), name, cat, rate, gst, hsn });
       added++;
     }
     persist();
-    toast(added + " items imported from CSV!");
-    renderInventory();
+    toast(LANG === "hi" ? `✅ ${added} नए सामान लिस्ट में जुड़ गए!` : `✅ ${added} items imported from CSV!`);
+    if(typeof onDone === "function"){
+      onDone();
+    } else if(VIEW === "inventory"){
+      renderInventory();
+    } else {
+      render();
+    }
   };
   rd.readAsText(file);
 }
@@ -3575,74 +3749,51 @@ function downloadSampleCsvFile(){
 /* ================= SETTINGS VIEW ================= */
 function renderSetup(){
   const s = DB.settings;
+  const isHi = LANG === "hi";
+
   $("#app").innerHTML = `<div class="stack">
     <h2 style="font-size:22px;font-weight:800;margin:0 0 8px">${t("setup")}</h2>
 
-    <form class="card stack" id="setupForm">
-      <label class="cust-label">${t("shopName")}</label>
-      <input type="text" id="sName" class="cust-inp" value="${esc(s.shopName)}">
-
-      <label class="cust-label">${t("address")}</label>
-      <input type="text" id="sAddr" class="cust-inp" value="${esc(s.address)}">
-
-      <label class="cust-label">${t("mobile")}</label>
-      <input type="tel" id="sMob" class="cust-inp" value="${esc(s.mobile)}">
-
-      <label class="cust-label">GSTIN</label>
-      <input type="text" id="sGstin" class="cust-inp" value="${esc(s.gstin || '')}" placeholder="23AAAAA0000A1Z5">
-
-      <label class="cust-label">${t("logo")}</label>
-      <div class="row">
-        ${s.logo ? `<img src="${s.logo}" style="width:48px;height:48px;border-radius:12px;object-fit:cover;border:1px solid var(--line)">` : ''}
-        <label class="btn sm" for="sLogoInp">📷 ${t("pickLogo")}</label>
-        <input type="file" id="sLogoInp" accept="image/*" hidden>
-        ${s.logo ? `<button type="button" class="btn sm danger" id="btnRmLogo">${t("removeLogo")}</button>` : ''}
+    <form class="card stack" id="setupForm" style="box-shadow:0 4px 18px rgba(0,0,0,0.06);border-radius:20px;padding:20px">
+      <div style="font-size:16px;font-weight:800;color:#0f172a;margin-bottom:2px;display:flex;align-items:center;gap:8px">
+        <span>🏪</span>
+        <span>${isHi ? "दुकान की जानकारी (Shop Profile)" : "Shop Profile & Details"}</span>
+      </div>
+      <div class="small muted" style="margin-bottom:12px;font-size:12px;color:#64748b">
+        ${isHi ? "यहाँ भरी जानकारी हर बिल, PDF इनवॉइस और WhatsApp मैसेज पर दिखाई देगी।" : "Details entered here will appear on all bills, PDF receipts & WhatsApp messages."}
       </div>
 
-      <label class="cust-label">${t("thanks")}</label>
-      <input type="text" id="sThanks" class="cust-inp" value="${esc(s.thanks)}">
+      <label class="cust-label">${t("shopName")} *</label>
+      <input type="text" id="sName" class="cust-inp" placeholder="${isHi ? 'उदा. राधे गारमेंट्स' : 'e.g. Radhe Garments'}" value="${esc(s.shopName || '')}">
 
-      <button type="submit" class="btn main" style="margin-top:8px">${t("settingsSaved").replace("!", "")}</button>
-    </form>
+      <label class="cust-label">${t("mobile")} (WhatsApp Helpline / Contact) *</label>
+      <input type="tel" id="sMob" class="cust-inp" placeholder="e.g. 9876543210" value="${esc(s.mobile || '')}">
 
-    <!-- Direct APK & Mobile Installation Card -->
-    <div class="card stack" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:18px">
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:22px">📲</span>
-        <div>
-          <div style="font-size:15px;font-weight:800;color:#166534">Android App (APK) & Mobile Install</div>
-          <div class="small muted" style="color:#15803d">बिना Android Studio के सीधे फ़ोन में चलाएं</div>
+      <label class="cust-label">${t("address")}</label>
+      <input type="text" id="sAddr" class="cust-inp" placeholder="${isHi ? 'उदा. मेन मार्केट, दुकान नं. 14' : 'e.g. Main Market, Shop #14'}" value="${esc(s.address || '')}">
+
+      <label class="cust-label">GSTIN (${isHi ? "वैकल्पिक" : "Optional"})</label>
+      <input type="text" id="sGstin" class="cust-inp" value="${esc(s.gstin || '')}" placeholder="23AAAAA0000A1Z5">
+
+      <label class="cust-label">${t("logo")} (${isHi ? "दुकान का लोगो" : "Shop Logo"})</label>
+      <div class="row" style="align-items:center;gap:12px">
+        ${s.logo ? `<img src="${s.logo}" style="width:52px;height:52px;border-radius:12px;object-fit:cover;border:2px solid #cbd5e1;box-shadow:0 2px 6px rgba(0,0,0,0.08)">` : `<div style="width:52px;height:52px;border-radius:12px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:24px;border:1.5px dashed #cbd5e1">🏪</div>`}
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label class="btn sm" for="sLogoInp" style="cursor:pointer;font-weight:700">📷 ${s.logo ? (isHi ? "लोगो बदलें" : "Change Logo") : t("pickLogo")}</label>
+          <input type="file" id="sLogoInp" accept="image/*" hidden>
+          ${s.logo ? `<button type="button" class="btn sm danger" id="btnRmLogo" style="font-size:11px">${t("removeLogo")}</button>` : ''}
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
-        <!-- 1-Click Install WebAPK -->
-        <button type="button" class="btn main" id="btnInstallPwa" style="background:#16a34a;color:#ffffff;border:none;min-height:44px;font-weight:800;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px">
-          <span>⚡</span>
-          <span>1-Click Install App on Phone (WebAPK)</span>
-        </button>
+      <label class="cust-label">${t("thanks")}</label>
+      <input type="text" id="sThanks" class="cust-inp" value="${esc(s.thanks || '')}">
 
-        <!-- Direct APK File Download -->
-        <a href="/kapda-bill.apk" download="kapda-bill.apk" class="btn" id="btnDirectApkLink" style="background:#ffffff;border:1.5px solid #86efac;color:#15803d;min-height:42px;font-weight:800;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none">
-          <span>⬇️</span>
-          <span>Download Android APK File (.apk)</span>
-        </a>
+      <button type="submit" class="btn main" id="btnSaveShopDetails" style="margin-top:14px;border-radius:14px;min-height:48px;font-weight:800;font-size:15px;background:#2563eb;color:#ffffff;box-shadow:0 4px 14px rgba(37,99,235,0.35);border:none">
+        💾 ${isHi ? "दुकान की जानकारी सेव करें (Save)" : "Save Shop Details"}
+      </button>
+    </form>
 
-        <!-- Download Project ZIP -->
-        <a href="/kapda-bill-pro.zip" download="kapda-bill-pro.zip" class="btn sm" style="background:#ffffff;border:1px solid #cbd5e1;color:#475569;font-weight:700;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none">
-          <span>📦</span>
-          <span>Download Project Full ZIP Archive</span>
-        </a>
-      </div>
-
-      <div class="small muted" style="font-size:11px;line-height:1.5;background:rgba(255,255,255,0.85);padding:10px;border-radius:10px;color:#334155;border:1px dashed #bbf7d0">
-        💡 <b>फ़ोन पर इनस्टॉल करने का सबसे आसान तरीका:</b><br>
-        1. Vercel लिंक को अपने Android फ़ोन में <b>Google Chrome</b> में खोलें।<br>
-        2. ऊपर दिए गए <b>1-Click Install App</b> पर टैप करें (या Chrome के तीन डॉट्स '⋮' दबाकर <b>'Install App' / 'Add to Home screen'</b> चुनें)।<br>
-        3. ऐप बिना किसी Android Studio के तुरंत आपके फ़ोन में असली ऐप की तरह इंस्टॉल हो जाएगा!
-      </div>
-    </div>
-
+    <!-- Data Backup & Restore -->
     <div class="card stack">
       <h3 style="font-size:16px;font-weight:800;margin:0">${t("backup")}</h3>
       <div class="row">
@@ -3653,6 +3804,24 @@ function renderSetup(){
     </div>
   </div>`;
 
+  const saveLiveSettings = () => {
+    DB.settings.shopName = $("#sName").value.trim();
+    DB.settings.address = $("#sAddr").value.trim();
+    DB.settings.mobile = $("#sMob").value.trim();
+    DB.settings.gstin = $("#sGstin").value.trim().toUpperCase();
+    DB.settings.thanks = $("#sThanks").value.trim();
+    persist();
+    updateHeader();
+  };
+
+  ["sName", "sAddr", "sMob", "sGstin", "sThanks"].forEach(id => {
+    const el = $("#" + id);
+    if(el){
+      el.oninput = saveLiveSettings;
+      el.onchange = saveLiveSettings;
+    }
+  });
+
   $("#sLogoInp").onchange = e => {
     const f = e.target.files[0];
     if(!f) return;
@@ -3660,6 +3829,7 @@ function renderSetup(){
     rd.onload = () => {
       DB.settings.logo = rd.result;
       persist();
+      updateHeader();
       renderSetup();
     };
     rd.readAsDataURL(f);
@@ -3669,20 +3839,15 @@ function renderSetup(){
     $("#btnRmLogo").onclick = () => {
       DB.settings.logo = "";
       persist();
+      updateHeader();
       renderSetup();
     };
   }
 
   $("#setupForm").onsubmit = e => {
     e.preventDefault();
-    DB.settings.shopName = $("#sName").value.trim();
-    DB.settings.address = $("#sAddr").value.trim();
-    DB.settings.mobile = $("#sMob").value.trim();
-    DB.settings.gstin = $("#sGstin").value.trim().toUpperCase();
-    DB.settings.thanks = $("#sThanks").value.trim();
-    persist();
-    toast(t("settingsSaved"));
-    render();
+    saveLiveSettings();
+    toast(isHi ? "✅ दुकान की जानकारी सुरक्षित हो गई!" : "✅ Shop details saved successfully!");
   };
 
   $("#btnDownloadBackup").onclick = () => {

@@ -238,9 +238,9 @@
 <div class="container">
   <div class="invoice-card" id="invoiceCard">
     <div class="shop-header">
-      <h1 class="shop-name" id="shopName">Kalyani Boutique</h1>
-      <div class="shop-meta" id="shopAddress">Main Market, Fashion Street</div>
-      <div class="shop-meta" id="shopContact">Phone: +91 98765 43210</div>
+      <h1 class="shop-name" id="shopName">Bill Book</h1>
+      <div class="shop-meta" id="shopAddress">Clothing Retail & Fashion Store</div>
+      <div class="shop-meta" id="shopContact"></div>
     </div>
 
     <div class="inv-badge-row">
@@ -341,12 +341,12 @@ const bill = parseBillData() || {
   taxable: 809.52,
   totalTax: 40.48,
   grandTotal: 850,
-  shop: { shopName: "Kalyani Boutique", address: "Main Market, Fashion Street", mobile: "9876543210" }
+  shop: { shopName: "Bill Book", address: "", mobile: "" }
 };
 
 // Render Bill
 document.getElementById("topShopName").textContent = bill.shop.shopName || "Bill Book";
-document.getElementById("shopName").textContent = bill.shop.shopName || "Kalyani Boutique";
+document.getElementById("shopName").textContent = bill.shop.shopName || "Bill Book";
 document.getElementById("shopAddress").textContent = bill.shop.address || "";
 document.getElementById("shopContact").textContent = bill.shop.mobile ? "Phone: +91 " + bill.shop.mobile : "";
 document.getElementById("invNo").textContent = "#" + bill.no;
