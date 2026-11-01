@@ -1,11 +1,7 @@
 {
   "version": 2,
+  "outputDirectory": "dist",
   "cleanUrls": true,
-  "rewrites": [
-    { "source": "/kapda-bill.apk", "destination": "/dist/kapda-bill.apk" },
-    { "source": "/kapda-bill-pro.zip", "destination": "/dist/kapda-bill-pro.zip" },
-    { "source": "/(.*)", "destination": "/dist/$1" }
-  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -19,12 +15,12 @@
       "source": "/(.*)\\.apk",
       "headers": [
         { "key": "Content-Type", "value": "application/vnd.android.package-archive" },
-        { "key": "Content-Disposition", "value": "attachment; filename=\"kapda-bill.apk\"" },
+        { "key": "Content-Disposition", "value": "attachment; filename=\"bill-book.apk\"" },
         { "key": "Cache-Control", "value": "public, max-age=3600" }
       ]
     },
     {
-      "source": "/dist/sw.js",
+      "source": "/sw.js",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
       ]

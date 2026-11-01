@@ -77,4 +77,12 @@ if HAS_PIL:
         return im
     icon(192,False).save(d/'icon-192.png'); icon(512,False).save(d/'icon-512.png'); icon(512,True).save(d/'icon-maskable-512.png')
 
+# Mirror to public folder for Vercel/hosts expecting public/
+import shutil
+pub = root / 'public'
+pub.mkdir(exist_ok=True)
+for item in d.iterdir():
+    if item.is_file():
+        shutil.copy2(item, pub / item.name)
+
 print("built",[p.name for p in d.iterdir()])
