@@ -37,6 +37,11 @@ inv_src = root/'src/invoice.html'
 if inv_src.exists():
     (d/'invoice.html').write_text(inv_src.read_text(encoding='utf-8'), encoding='utf-8')
 
+# Copy infincode.csv
+inf_src = root/'infincode.csv'
+if inf_src.exists():
+    (d/'infincode.csv').write_text(inf_src.read_text(encoding='utf-8'), encoding='utf-8')
+
 (d/'manifest.json').write_text(json.dumps({"name":"Bill Book","short_name":"Bill Book","start_url":"./index.html","scope":"./","display":"standalone","orientation":"portrait","background_color":"#f8fafc","theme_color":"#2563eb","lang":"hi",
  "icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},{"src":"icon-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]},ensure_ascii=False,indent=1),encoding='utf-8')
 sw='''/* Kapda Bill service worker: makes the app open without internet. */

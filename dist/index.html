@@ -58,6 +58,9 @@ html, body{
   margin: 0;
   -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
 }
 
 body::before{
@@ -161,7 +164,10 @@ button, input, select, textarea{
 /* App Container */
 .wrap{
   max-width: 600px;
+  width: 100%;
   margin: 0 auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-top: 14px;
@@ -312,6 +318,10 @@ button, input, select, textarea{
   gap: 12px;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
   transition: all 0.15s ease;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 .item-row:hover{
   border-color: #cbd5e1;
@@ -322,6 +332,12 @@ button, input, select, textarea{
   gap: 12px;
   min-width: 0;
   flex: 1;
+  overflow: hidden;
+}
+.item-row-left > div{
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
 }
 .item-tag{
   padding: 4px 8px;
@@ -332,12 +348,18 @@ button, input, select, textarea{
   font-weight: 700;
   white-space: nowrap;
   letter-spacing: 0.02em;
+  flex-shrink: 0;
 }
 .item-title{
   font-weight: 700;
   font-size: 15px;
   color: var(--ink);
   line-height: 1.3;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  word-wrap: break-word;
+  min-width: 0;
+  max-width: 100%;
 }
 .item-sub{
   font-size: 12px;
@@ -346,6 +368,8 @@ button, input, select, textarea{
   gap: 6px;
   align-items: center;
   margin-top: 2px;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 .item-stepper{
   display: flex;
@@ -501,8 +525,14 @@ button, input, select, textarea{
 .scrim{
   position: fixed;
   inset: 0;
+  width: 100vw;
+  max-width: 100vw;
+  overflow-x: hidden;
+  left: 0;
+  right: 0;
   background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 60;
   display: flex;
   align-items: flex-end;
@@ -519,7 +549,10 @@ button, input, select, textarea{
   gap: 14px;
   max-height: 92vh;
   overflow-y: auto;
+  overflow-x: hidden;
   box-shadow: var(--shadow-lg);
+  box-sizing: border-box;
+  margin: 0 auto;
 }
 .sheet.sheet-slide-in{
   animation: slideUpSheet 0.22s cubic-bezier(0.16, 1, 0.3, 1);
@@ -574,22 +607,33 @@ button, input, select, textarea{
   border-radius: 16px;
   padding: 12px 14px;
   box-shadow: var(--shadow-sm);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .inv-item-top{
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  min-width: 0;
 }
 .inv-item-name{
   font-weight: 700;
   font-size: 15px;
   color: #0f172a;
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .inv-item-price{
   font-weight: 800;
   font-size: 16px;
   font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 .inv-item-meta{
   font-size: 12px;
@@ -1926,11 +1970,20 @@ try {
     if(DB.settings.mobile === "9876543210") DB.settings.mobile = "";
     if(DB.settings.address === "Main Market, Fashion Street") DB.settings.address = "";
     if(DB.settings.gstin === "23AABCU9603R1ZM") DB.settings.gstin = "";
-    // SaaS Clean Slate: Starting with 0 items, filter out any legacy dummy mock items
+    // SaaS Clean Slate & Excel Binary Purge: Filter out legacy placeholders AND any corrupt items imported from binary Excel/zip files
     if(Array.isArray(DB.items)){
-      DB.items = DB.items.filter(it => it && !/^i\d+$/.test(String(it.id)) && it.name !== "Handloom Cotton Kurta" && it.name !== "Premium Silk Saree");
+      DB.items = DB.items.filter(it => {
+        if(!it || !it.name) return false;
+        if(/^i\d+$/.test(String(it.id))) return false;
+        if(it.name.includes("\uFFFD") || it.name.includes("workbook.xml") || it.name.includes("Content_Types") || it.name.includes("PK\x03\x04")) return false;
+        if(/[\x00-\x1F\x7F-\x9F]/.test(it.name)) return false;
+        return true;
+      });
     } else {
       DB.items = [];
+    }
+    if(DB.cart && Array.isArray(DB.cart.items)){
+      DB.cart.items = DB.cart.items.filter(it => it && it.name && !it.name.includes("\uFFFD") && !it.name.includes("workbook.xml") && !/[\x00-\x1F\x7F-\x9F]/.test(it.name));
     }
   }
 } catch(e){}
@@ -3057,8 +3110,10 @@ function updateInvoiceModal(catalogOnly = false){
   const chipsHost = $("#modalQuickChips");
   if(chipsHost){
     chipsHost.innerHTML = selectableItems.slice(0, 8).map(it => `
-      <button type="button" class="btn sm" style="background:#ffffff;border:1px solid #bbf7d0;font-size:12px;font-weight:700;color:#15803d;padding:5px 10px;border-radius:999px;box-shadow:0 1px 3px rgba(0,0,0,0.04)" data-quick-add="${it.id}">
-        ＋ ${esc(it.name)} <span style="opacity:0.75;font-weight:600">(${rs(it.rate)})</span>
+      <button type="button" class="btn sm" style="background:#ffffff;border:1px solid #bbf7d0;font-size:12px;font-weight:700;color:#15803d;padding:5px 10px;border-radius:999px;box-shadow:0 1px 3px rgba(0,0,0,0.04);max-width:100%;display:inline-flex;align-items:center;gap:4px;overflow:hidden" data-quick-add="${it.id}">
+        <span>＋</span>
+        <span style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(it.name)}</span>
+        <span style="opacity:0.75;font-weight:600;white-space:nowrap">(${rs(it.rate)})</span>
       </button>
     `).join("");
 
@@ -3928,23 +3983,23 @@ function renderInventory(){
         </label>
       </div>
 
-      <!-- Card 2: Sample CSV & 1-Tap Load -->
+      <!-- Card 2: infincode.csv (100 Items) & 1-Tap Load -->
       <div class="card" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-          <div style="width:38px;height:38px;border-radius:10px;background:#eff6ff;color:#2563eb;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid #bfdbfe">📥</div>
+          <div style="width:38px;height:38px;border-radius:10px;background:#eff6ff;color:#2563eb;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid #bfdbfe">📦</div>
           <div>
-            <div style="font-size:15px;font-weight:800;color:#0f172a">2. ${isHi ? "सैंपल CSV टेम्पलेट" : "Sample Template"}</div>
-            <div style="font-size:12px;color:#64748b">${isHi ? "रेडीमेड फ़ॉर्मेट डाउनलोड करें या सीधे 5 कपड़े लोड करें" : "Download format or load 5 demo items instantly"}</div>
+            <div style="font-size:15px;font-weight:800;color:#0f172a">2. infincode.csv (100 ${isHi ? "कपड़े" : "Items"})</div>
+            <div style="font-size:12px;color:#64748b">${isHi ? "100 रेडीमेड कपड़े डाउनलोड करें या 1-क्लिक में तुरंत लोड करें" : "Download 100 clothes CSV or load instantly with 1-tap"}</div>
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <button type="button" class="btn" id="btnSampleCsv" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:10px;font-weight:700;color:#0f172a;min-height:42px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            <span>${isHi ? "सैंपल डाउनलोड" : "Download Sample"}</span>
+          <button type="button" class="btn" id="btnSampleCsv" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:10px;font-weight:700;color:#0f172a;min-height:42px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>${isHi ? "डाउनलोड infincode" : "Download infincode"}</span>
           </button>
-          <button type="button" class="btn" id="btnLoadDemoItems" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;font-weight:800;color:#2563eb;min-height:42px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px">
+          <button type="button" class="btn" id="btnLoadDemoItems" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;font-weight:800;color:#2563eb;min-height:42px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px">
             <span>⚡</span>
-            <span>${isHi ? "5 कपड़े लोड करें" : "Load 5 Demo Items"}</span>
+            <span>${isHi ? "100 कपड़े लोड करें" : "Load 100 Items"}</span>
           </button>
         </div>
       </div>
@@ -3971,6 +4026,11 @@ function renderInventory(){
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         <span>${isHi ? "दुकान में कुल सामान" : "Current Store Items"} (${DB.items.length})</span>
       </div>
+      ${DB.items.length ? `
+        <button type="button" class="btn sm danger" id="btnClearAllCatalog" style="font-size:11px;padding:4px 10px;border-radius:8px">
+          🗑️ ${isHi ? "सभी हटाएं" : "Clear All"}
+        </button>
+      ` : ''}
     </div>
 
     <div class="stack" id="invItemsList">
@@ -4016,6 +4076,17 @@ function renderInventory(){
   $("#btnLoadDemoItems").onclick = loadSampleItemsDirectly;
   $("#btnOpenPasteCsv").onclick = openPasteCsvModal;
 
+  if($("#btnClearAllCatalog")){
+    $("#btnClearAllCatalog").onclick = () => {
+      if(confirm(isHi ? "क्या आप वाकई दुकान के सभी कपड़े हटाना चाहते हैं?" : "Are you sure you want to delete all items from catalog?")){
+        DB.items = [];
+        persist();
+        renderInventory();
+        toast(isHi ? "कैटलॉग खाली कर दिया गया" : "Catalog cleared");
+      }
+    };
+  }
+
   document.querySelectorAll("[data-del-item]").forEach(b => {
     b.onclick = () => {
       DB.items = DB.items.filter(x => x.id !== b.dataset.delItem);
@@ -4025,8 +4096,120 @@ function renderInventory(){
   });
 }
 
+const INFINCODE_CSV_CONTENT = `Item Name,Category,Rate,GST Rate,HSN Code
+Handloom Cotton Kurta,Kurta,850,5,6204
+Premium Silk Saree,Saree,3500,12,5208
+Festive Georgette Lehenga,Lehenga,6499,12,6204
+Slim Fit Cotton Shirt,Shirt,799,5,6205
+Stretch Denim Jeans,Jeans,1299,5,6203
+Pure Linen Formal Shirt,Shirt,1499,5,6205
+Banarasi Zari Saree,Saree,4800,12,5208
+Casual Polo T-Shirt,T-Shirt,599,5,6109
+Formal Poly-Viscose Trousers,Trousers,999,5,6203
+Embroidered Anarkali Suit,Ethnic,2899,12,6204
+Nehru Jacket Modi Cut,Traditional,1699,5,6203
+Pathani Kurta Pajama Set,Kurta,1850,5,6203
+Chanderi Cotton Saree,Saree,2200,5,5208
+Oversized Streetwear T-Shirt,T-Shirt,699,5,6109
+Slim Fit Stretch Chinos,Trousers,1199,5,6203
+Party Wear Velvet Blazer,Blazer,3999,12,6203
+Bridal Silk Lehenga Choli,Lehenga,12500,12,6204
+Casual Checked Cotton Shirt,Shirt,749,5,6205
+Bandhani Print Georgette Saree,Saree,1899,5,5208
+Regular Fit Denim Jeans,Jeans,1150,5,6203
+Floral Printed Rayon Kurti,Kurta,499,5,6204
+Printed Palazzo Set with Dupatta,Ethnic,1499,5,6204
+Dry-Fit Sports T-Shirt,T-Shirt,450,5,6109
+Smart Casual Khaki Cargo,Trousers,1399,5,6203
+Traditional Wedding Sherwani,Traditional,8999,12,6203
+Kalamkari Handblock Print Saree,Saree,2600,5,5208
+Short Summer Cotton Kurta,Kurta,650,5,6204
+Classic White Formal Shirt,Shirt,899,5,6205
+Washed Black Denim Jeans,Jeans,1350,5,6203
+Festive Sharara Dress Set,Ethnic,2299,12,6204
+Linen Mandarin Collar Kurta,Kurta,1100,5,6204
+Kanjivaram Semi-Silk Saree,Saree,5500,12,5208
+Solid Crew Neck Cotton Tee,T-Shirt,399,5,6109
+Pleated Executive Trousers,Trousers,1050,5,6203
+Royal Blue 2-Piece Suit,Blazer,5999,12,6203
+Sequined Bollywood Lehenga,Lehenga,7999,12,6204
+Full Sleeve Denim Shirt,Shirt,1099,5,6205
+Organza Embroidered Saree,Saree,3200,12,5208
+Jogger Style Denim Jeans,Jeans,1250,5,6203
+Chikankari Handwork Kurti,Kurta,1299,5,6204
+Straight Fit Salwar Suit,Ethnic,1650,5,6204
+Striped Bio-Wash T-Shirt,T-Shirt,549,5,6109
+Slim Fit Ankle Length Chinos,Trousers,1299,5,6203
+Silk Blend Festive Nehru Coat,Traditional,1999,5,6203
+Kota Doria Lightweight Saree,Saree,1450,5,5208
+Mirror Work Short Kurti,Kurta,799,5,6204
+Oxford Weave Formal Shirt,Shirt,950,5,6205
+Ripped Distress Denim,Jeans,1499,5,6203
+Embroidered Peplum Gharara Set,Ethnic,2799,12,6204
+Raw Silk Designer Sherwani,Traditional,10500,12,6203
+Tussar Silk Festive Saree,Saree,3800,12,5208
+Henley Neck Waffle T-Shirt,T-Shirt,649,5,6109
+Formal Flat Front Trousers,Trousers,920,5,6203
+Classic Tuxedo Blazer,Blazer,6499,12,6203
+Mirror Work Navratri Chaniya Choli,Lehenga,5800,12,6204
+Flannel Winter Checked Shirt,Shirt,999,5,6205
+Georgette Ruffle Saree,Saree,2499,5,5208
+Skinny Fit Blue Jeans,Jeans,1299,5,6203
+A-Line Long Rayon Kurta,Kurta,699,5,6204
+Cotton Daily Wear Salwar Suit,Ethnic,999,5,6204
+Drop Shoulder Oversized Tee,T-Shirt,750,5,6109
+Relaxed Fit Khaki Trouser,Trousers,1099,5,6203
+Jodhpuri Bandhgala Suit,Traditional,6800,12,6203
+Pashmina Woven Kashmiri Saree,Saree,4200,12,5208
+Men Cotton Dhoti Kurta Set,Traditional,1599,5,6203
+Satin Silk Evening Shirt,Shirt,1199,5,6205
+Dark Grey Rugged Denim,Jeans,1399,5,6203
+Floral Organza Lehenga,Lehenga,6200,12,6204
+Angrakha Style Flared Kurta,Kurta,1150,5,6204
+Heavy Dupatta Silk Suit Set,Ethnic,3100,12,6204
+Printed Gym Training Tee,T-Shirt,499,5,6109
+Wrinkle Free Office Trousers,Trousers,1150,5,6203
+Velvet Embroidered Bandhgala,Traditional,7500,12,6203
+Mysore Silk Golden Saree,Saree,3900,12,5208
+Khadi Cotton Summer Kurta,Kurta,750,5,6204
+Mandarin Collar Linen Shirt,Shirt,1299,5,6205
+Straight Cut Classic Jeans,Jeans,1199,5,6203
+Net Embroidered Party Lehenga,Lehenga,7400,12,6204
+Kashmiri Tilla Work Kurti,Kurta,1450,5,6204
+Pure Cotton Jaipuri Kurti Pant,Ethnic,1350,5,6204
+Activewear Raglan Tee,T-Shirt,520,5,6109
+Italian Fit Woolen Trouser,Trousers,1650,12,6203
+Royal Heritage Sherwani Set,Traditional,14999,12,6203
+Paithani Silk Zari Saree,Saree,6200,12,5208
+Festive Silk Nehru Jacket,Traditional,1850,5,6203
+Half Sleeve Casual Resort Shirt,Shirt,699,5,6205
+Biker Style Denim Jeans,Jeans,1599,5,6203
+Velvet Party Wear Lehenga,Lehenga,8999,12,6204
+Embroidered Front Slit Kurta,Kurta,1050,5,6204
+Tiered Flared Anarkali Gown,Ethnic,2499,12,6204
+Graphic Cotton Casual Tee,T-Shirt,480,5,6109
+Cotton Lycra Stretchable Trousers,Trousers,999,5,6203
+Double Breasted Formal Blazer,Blazer,4500,12,6203
+Kanjeevaram Pattu Saree,Saree,8500,12,5208
+Lucknowi Chikankari Kurta Pajama,Traditional,2150,5,6203
+Cuban Collar Summer Shirt,Shirt,850,5,6205
+Vintage Washed Blue Jeans,Jeans,1399,5,6203
+Silk Jacquard Wedding Lehenga,Lehenga,9800,12,6204
+Gotta Patti Work Kurti,Kurta,899,5,6204
+Ready to Wear Pre-Stitched Saree,Saree,2999,5,5208
+Raymond Unstitched Suiting Fabric,Fabrics,1850,5,5208
+Gwalior Poly-Wool Suit Length,Fabrics,1450,5,5208
+Pure Cotton Dress Material Set,Fabrics,850,5,5208`;
+
 function importCsvText(csvText, onDone){
   if(!csvText || typeof csvText !== "string") return;
+  // Detect binary Excel (.xlsx / .xls / PKZIP)
+  if(csvText.startsWith("PK\x03\x04") || csvText.includes("[Content_Types].xml") || csvText.includes("xl/workbook") || /[\x00\x01\x02\x03\x04\x05]/.test(csvText.slice(0, 100))){
+    toast(LANG === "hi" 
+      ? "⚠️ यह Excel (.xlsx) बाइनरी फ़ाइल है! कृपया इसे CSV (.csv) फ़ाइल में बदलें या नीचे '100 कपड़े लोड करें' दबाएं।" 
+      : "⚠️ Excel (.xlsx) file detected! Please select a .csv file or tap 'Load 100 Items'.", 5000);
+    return;
+  }
   const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
   if(lines.length <= 1){
     toast(LANG === "hi" ? "CSV में कोई सामान नहीं मिला" : "No items found in CSV");
@@ -4045,17 +4228,22 @@ function importCsvText(csvText, onDone){
   let added = 0;
   for(let i = 1; i < lines.length; i++){
     const cols = lines[i].split(delim).map(c => c.trim().replace(/^["']|["']$/g, ""));
-    const name = cols[nameIdx];
-    if(!name) continue;
-    const cat = (catIdx !== -1 && cols[catIdx]) ? cols[catIdx] : "Garment";
+    const rawName = cols[nameIdx];
+    if(!rawName) continue;
+    // Sanitize and filter out corrupt binary characters
+    const cleanName = rawName.replace(/[\x00-\x1F\x7F-\x9F\uFFFD\uFFFE\uFFFF]/g, '').trim();
+    if(cleanName.length < 2 || cleanName.includes("workbook.xml") || cleanName.includes("[Content_Types]")) continue;
+    const name = cleanName.slice(0, 90);
+
+    const cat = (catIdx !== -1 && cols[catIdx]) ? cols[catIdx].replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim().slice(0, 30) : "Garment";
     const rate = (rateIdx !== -1 && Number(cols[rateIdx]) && Number(cols[rateIdx]) > 0) ? Number(cols[rateIdx]) : 500;
-    const hsn = hsnIdx !== -1 ? cols[hsnIdx] : "6204";
+    const hsn = hsnIdx !== -1 ? cols[hsnIdx].slice(0, 10) : "6204";
     const gst = (gstIdx !== -1 && !isNaN(Number(cols[gstIdx]))) ? Number(cols[gstIdx]) : 5;
-    DB.items.push({ id: uid(), name, cat, rate, gst, hsn });
+    DB.items.push({ id: uid(), name, cat: cat || "Garment", rate, gst, hsn });
     added++;
   }
   persist();
-  toast(LANG === "hi" ? `✅ ${added} नए सामान लिस्ट में जुड़ गए!` : `✅ ${added} items imported!`);
+  toast(LANG === "hi" ? `✅ ${added} नए कपड़े कैटलॉग में जुड़ गए!` : `✅ ${added} items imported!`);
   if(typeof onDone === "function"){
     onDone();
   } else if(VIEW === "inventory"){
@@ -4067,19 +4255,29 @@ function importCsvText(csvText, onDone){
 
 function parseAndImportCsv(file, onDone){
   if(!file) return;
+  if(file.name && (file.name.toLowerCase().endsWith(".xlsx") || file.name.toLowerCase().endsWith(".xls"))){
+    toast(LANG === "hi" 
+      ? "⚠️ आपने Excel (.xlsx) फ़ाइल चुनी है! कृपया इसे 'Save As CSV (.csv)' करें या नीचे '100 कपड़े लोड करें' बटन दबाएं।" 
+      : "⚠️ Excel (.xlsx) detected! Please Save As CSV or tap 'Load 100 Items' below.", 5000);
+    return;
+  }
   const rd = new FileReader();
   rd.onload = e => importCsvText(e.target.result, onDone);
   rd.onerror = () => toast("Error reading file");
   rd.readAsText(file);
 }
 
+function loadSampleItemsDirectly(){
+  importCsvText(INFINCODE_CSV_CONTENT, () => {
+    toast(LANG === "hi" ? "✅ 100 कपड़े (infincode.csv) कैटलॉग में जुड़ गए!" : "✅ 100 items (infincode.csv) loaded!");
+    if(VIEW === "inventory") renderInventory();
+    else renderShopFloor();
+  });
+}
+
 async function downloadSampleCsvFile(){
-  const content = "Item Name,Category,Rate,GST Rate,HSN Code\n" +
-    "Handloom Cotton Kurta,Kurta,850,5,6204\n" +
-    "Premium Silk Saree,Saree,3500,12,5208\n" +
-    "Festive Georgette Lehenga,Lehenga,6499,12,6204\n" +
-    "Slim Fit Cotton Shirt,Shirt,799,5,6205\n" +
-    "Stretch Denim Jeans,Jeans,1299,5,6203\n";
+  const content = INFINCODE_CSV_CONTENT;
+  const fileName = "infincode.csv";
 
   // 1. Copy sample text to clipboard as guaranteed instant backup on mobile
   if(navigator.clipboard && navigator.clipboard.writeText){
@@ -4092,18 +4290,18 @@ async function downloadSampleCsvFile(){
     if(cap.Plugins.Filesystem){
       try {
         const res = await cap.Plugins.Filesystem.writeFile({
-          path: "Sample_Items_KapdaBill.csv",
+          path: fileName,
           data: content,
           directory: "DOCUMENTS",
           encoding: "utf8"
         });
         if(cap.Plugins.Share && res && res.uri){
           await cap.Plugins.Share.share({
-            title: "Sample_Items_KapdaBill.csv",
+            title: fileName,
             url: res.uri,
-            dialogTitle: "Save / Open Sample CSV"
+            dialogTitle: "Save / Open infincode.csv"
           });
-          toast(LANG === "hi" ? "✅ सैंपल CSV Documents में सेव हो गया!" : "✅ Sample CSV saved to Documents!");
+          toast(LANG === "hi" ? "✅ infincode.csv Documents में सेव हो गया!" : "✅ infincode.csv saved to Documents!");
           return;
         }
       } catch(fsErr){
@@ -4113,11 +4311,11 @@ async function downloadSampleCsvFile(){
     if(cap.Plugins.Share){
       try {
         await cap.Plugins.Share.share({
-          title: "Sample_Items_KapdaBill.csv",
+          title: fileName,
           text: content,
-          dialogTitle: "Save / Share Sample CSV"
+          dialogTitle: "Save / Share infincode.csv"
         });
-        toast(LANG === "hi" ? "✅ सैंपल CSV शेयर / सेव हो गया!" : "✅ Sample CSV shared!");
+        toast(LANG === "hi" ? "✅ infincode.csv शेयर / सेव हो गया!" : "✅ infincode.csv shared!");
         return;
       } catch(shareErr){}
     }
@@ -4128,14 +4326,14 @@ async function downloadSampleCsvFile(){
     const encodedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(content);
     const a = document.createElement("a");
     a.href = encodedUri;
-    a.download = "Sample_Items_KapdaBill.csv";
+    a.download = fileName;
     a.target = "_blank";
     document.body.appendChild(a);
     a.click();
     a.remove();
   } catch(e){}
 
-  toast(LANG === "hi" ? "✅ सैंपल CSV डाउनलोड हुआ व क्लिपबोर्ड पर कॉपी हो गया!" : "✅ Sample CSV downloaded & copied to clipboard!");
+  toast(LANG === "hi" ? "✅ infincode.csv डाउनलोड हुआ व क्लिपबोर्ड पर कॉपी हो गया!" : "✅ infincode.csv downloaded & copied to clipboard!");
 }
 
 function openPasteCsvModal(){
