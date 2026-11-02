@@ -85,4 +85,11 @@ for item in d.iterdir():
     if item.is_file():
         shutil.copy2(item, pub / item.name)
 
+# Mirror to Android assets directory for Capacitor APK
+android_pub = root / 'android/app/src/main/assets/public'
+if android_pub.exists():
+    for item in d.iterdir():
+        if item.is_file():
+            shutil.copy2(item, android_pub / item.name)
+
 print("built",[p.name for p in d.iterdir()])

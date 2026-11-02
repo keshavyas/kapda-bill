@@ -168,67 +168,64 @@ button, input, select, textarea{
 .muted{color: var(--muted)}
 .small{font-size: 13px}
 
-/* Pastel Shop Floor Banner Card (Screenshot 1) */
+/* Modern Obsidian Retail Command Card (Handcrafted Engineering Aesthetic) */
 .hero-card{
-  background: linear-gradient(135deg, #e0e7ff 0%, #ede9fe 50%, #fce7f3 100%);
-  border-radius: 24px;
-  padding: 20px;
+  background: #0f172a;
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 18px 20px;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(226, 232, 240, 0.6);
+  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.16);
+  border: 1px solid #1e293b;
 }
-.hero-card::after{
-  content: "";
-  position: absolute;
-  top: -20px;
-  right: -20px;
-  width: 120px;
-  height: 120px;
-  border-radius: 999px;
-  background: rgba(254, 215, 170, 0.4);
-  filter: blur(10px);
+.hero-card-top{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
 .hero-sub{
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
-  color: #4f46e5;
-  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
 }
 .hero-title{
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 800;
-  color: #0f172a;
-  letter-spacing: -0.03em;
-  margin: 0 0 16px;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin: 0;
 }
 .hero-stats{
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
   position: relative;
   z-index: 2;
 }
 .hero-stat-card{
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 12px 14px;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 10px 12px;
 }
 .hero-stat-label{
-  font-size: 12px;
-  color: var(--muted);
+  font-size: 11px;
+  color: #94a3b8;
   font-weight: 600;
 }
 .hero-stat-val{
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
-  color: #4338ca;
+  color: #38bdf8;
   font-variant-numeric: tabular-nums;
   margin-top: 2px;
 }
 
-/* Search Input (Screenshot 1) */
+/* Search Input (Crisp Pill) */
 .search-box{
   position: relative;
   width: 100%;
@@ -245,13 +242,14 @@ button, input, select, textarea{
 .search-inp{
   width: 100%;
   min-height: 48px;
-  border-radius: 999px;
+  border-radius: 14px;
   background: #ffffff;
   border: 1px solid var(--line);
   padding: 10px 18px 10px 44px;
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--ink);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
   transition: all 0.2s ease;
 }
 .search-inp:focus{
@@ -259,7 +257,7 @@ button, input, select, textarea{
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* Category Filter Pills (Screenshot 1) */
+/* Category Filter Pills (Tactile Rail) */
 .cat-scroll{
   display: flex;
   gap: 8px;
@@ -269,24 +267,25 @@ button, input, select, textarea{
 }
 .cat-scroll::-webkit-scrollbar{display: none;}
 .cat-pill{
-  border: none;
-  background: #eff6ff;
-  color: #2563eb;
-  padding: 8px 18px;
-  border-radius: 999px;
-  font-size: 14px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  padding: 6px 16px;
+  border-radius: 12px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
 }
 .cat-pill.active{
-  background: #2563eb;
+  background: #0f172a;
   color: #ffffff;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+  border-color: #0f172a;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
 }
 
-/* Items List (Clean, modern list rows, no photo boxes) */
+/* Items List (Handcrafted Retail Card with Direct Stepper) */
 .item-row{
   background: #ffffff;
   border: 1px solid var(--line);
@@ -296,12 +295,11 @@ button, input, select, textarea{
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
   transition: all 0.15s ease;
 }
 .item-row:hover{
-  border-color: var(--primary-border);
-  box-shadow: var(--shadow-md);
+  border-color: #cbd5e1;
 }
 .item-row-left{
   display: flex;
@@ -310,23 +308,21 @@ button, input, select, textarea{
   min-width: 0;
   flex: 1;
 }
-.item-icon{
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+.item-tag{
+  padding: 4px 8px;
   background: #f1f5f9;
   color: #475569;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 .item-title{
   font-weight: 700;
   font-size: 15px;
   color: var(--ink);
-  overflow-wrap: anywhere;
+  line-height: 1.3;
 }
 .item-sub{
   font-size: 12px;
@@ -334,30 +330,58 @@ button, input, select, textarea{
   display: flex;
   gap: 6px;
   align-items: center;
+  margin-top: 2px;
+}
+.item-stepper{
+  display: flex;
+  align-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  overflow: hidden;
+}
+.item-stepper button{
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #0f172a;
+  font-weight: 800;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.item-stepper button:active{
+  background: #e2e8f0;
+}
+.item-stepper span{
+  padding: 0 8px;
+  font-weight: 800;
+  font-size: 14px;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
 }
 .item-add-btn{
-  border: 1px solid var(--line);
-  background: #ffffff;
+  border: 1.5px solid #2563eb;
+  background: #eff6ff;
   color: #2563eb;
   padding: 6px 14px;
-  border-radius: 999px;
+  border-radius: 10px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 4px;
   transition: all 0.15s ease;
 }
-.item-add-btn:hover{
-  background: #eff6ff;
-  border-color: #bfdbfe;
-  transform: translateY(-1px);
-}
-.item-add-btn.in-cart{
+.item-add-btn:active{
+  transform: scale(0.96);
   background: #2563eb;
   color: #ffffff;
-  border-color: #2563eb;
 }
 
 /* Floating Bottom Cart Bar */
@@ -2088,6 +2112,90 @@ function toast(msg, ms = 2800){
   toast._t = setTimeout(() => { h.innerHTML = ""; }, ms);
 }
 
+/* Client-side image compression to prevent QuotaExceededError in Android WebView localStorage */
+function compressImage(file, maxDim, quality, callback){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if(w > maxDim || h > maxDim){
+        if(w > h){
+          h = Math.round((h * maxDim) / w);
+          w = maxDim;
+        } else {
+          w = Math.round((w * maxDim) / h);
+          h = maxDim;
+        }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL("image/jpeg", quality || 0.85);
+      callback(dataUrl);
+    };
+    img.onerror = () => callback(ev.target.result);
+    img.src = ev.target.result;
+  };
+  reader.onerror = () => toast("Error reading image file");
+  reader.readAsDataURL(file);
+}
+
+/* Quick Add / Remove Cart Operations for Shop Floor Catalog */
+function addItemToCart(id){
+  const it = DB.items.find(x => x.id === id);
+  if(!it) return;
+  const exist = DB.cart.items.find(x => x.id === it.id);
+  if(exist) exist.qty++;
+  else DB.cart.items.push(Object.assign({}, it, { qty: 1 }));
+  persist();
+  renderCartBar();
+  updateShopFloorItems();
+}
+
+function decItemInCart(id){
+  const exist = DB.cart.items.find(x => x.id === id);
+  if(!exist) return;
+  exist.qty--;
+  if(exist.qty <= 0){
+    DB.cart.items = DB.cart.items.filter(x => x.id !== id);
+  }
+  persist();
+  renderCartBar();
+  updateShopFloorItems();
+}
+
+function bindCartItemButtons(container){
+  if(!container) return;
+  container.querySelectorAll("[data-add-cart]").forEach(b => {
+    b.onclick = (e) => { e.stopPropagation(); addItemToCart(b.dataset.addCart); };
+  });
+  container.querySelectorAll("[data-inc-cart]").forEach(b => {
+    b.onclick = (e) => { e.stopPropagation(); addItemToCart(b.dataset.incCart); };
+  });
+  container.querySelectorAll("[data-dec-cart]").forEach(b => {
+    b.onclick = (e) => { e.stopPropagation(); decItemInCart(b.dataset.decCart); };
+  });
+}
+
+function loadSampleItemsDirectly(){
+  const samples = [
+    { id: uid(), name: "Handloom Cotton Kurta", cat: "Kurta", rate: 850, gst: 5, hsn: "6204" },
+    { id: uid(), name: "Premium Silk Saree", cat: "Saree", rate: 3500, gst: 12, hsn: "5208" },
+    { id: uid(), name: "Festive Georgette Lehenga", cat: "Lehenga", rate: 6499, gst: 12, hsn: "6204" },
+    { id: uid(), name: "Slim Fit Cotton Shirt", cat: "Shirt", rate: 799, gst: 5, hsn: "6205" },
+    { id: uid(), name: "Stretch Denim Jeans", cat: "Jeans", rate: 1299, gst: 5, hsn: "6203" }
+  ];
+  DB.items.push(...samples);
+  persist();
+  toast(LANG === "hi" ? "✅ 5 सैंपल कपड़े कैटलॉग में जुड़ गए!" : "✅ 5 sample items loaded into catalog!");
+  if(VIEW === "inventory") renderInventory();
+  else renderShopFloor();
+}
+
 /* ================= Header Setup ================= */
 function updateHeader(){
   const s = DB.settings;
@@ -2185,15 +2293,22 @@ function renderCartBar(){
     return;
   }
   const count = DB.cart.items.reduce((s, it) => s + it.qty, 0);
+  if(count === 0){
+    host.innerHTML = "";
+    return;
+  }
   const totals = getCartTotals();
   host.innerHTML = `<div class="cart-floating-bar" id="openFinalInvoiceBar">
-    <div>
-      <div style="font-weight:800;font-size:15px">${count > 0 ? count + ' ' + t('items') + ' · ' + rs(totals.grandTotal) : t('makeBill')}</div>
-      <div style="font-size:11px;opacity:0.85">${count > 0 ? totals.totalPieces + ' ' + t('pieces') + ' ' + t('inBill') : t('selectItemInBill')}</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="background:#2563eb;color:#ffffff;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px">${count} ${t('items')}</div>
+      <div>
+        <div style="font-weight:800;font-size:15px;color:#ffffff;font-variant-numeric:tabular-nums">${rs(totals.grandTotal)}</div>
+        <div style="font-size:11px;color:#94a3b8">${totals.totalPieces} ${t('pieces')} ${t('inBill')}</div>
+      </div>
     </div>
-    <button type="button" class="cart-floating-btn">
-      <span>${count > 0 ? t('reviewBill') : t('createBillNow')}</span>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+    <button type="button" class="cart-floating-btn" style="background:#2563eb;color:#ffffff;border:none;padding:8px 16px;border-radius:999px;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px">
+      <span>${t('reviewBill')}</span>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
   </div>`;
 
@@ -2229,43 +2344,36 @@ function renderShopFloor(){
   const isHi = LANG === "hi";
 
   $("#app").innerHTML = `<div class="stack">
-    <!-- SaaS Shop Identity Banner -->
-    <div style="display:flex;align-items:center;justify-content:space-between;background:#ffffff;padding:8px 12px;border-radius:14px;border:1px solid #e2e8f0;margin-bottom:8px;box-shadow:0 2px 6px rgba(0,0,0,0.03)">
-      <div style="display:flex;align-items:center;gap:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:700;color:#0f172a">
-        <span style="font-size:16px">🏪</span>
-        <span style="overflow:hidden;text-overflow:ellipsis">${esc(DB.settings.shopName || (isHi ? 'दुकान सेट नहीं है' : 'Shop Not Configured'))}</span>
-        ${DB.settings.mobile ? `<span style="color:#64748b;font-weight:600;font-size:12px">· 📱 ${esc(DB.settings.mobile)}</span>` : ''}
-      </div>
-      <button type="button" id="btnShopHeaderSwitch" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px">
-        <span>🔄</span>
-        <span>${DB.settings.shopName ? (isHi ? "दुकान बदलें" : "Switch Shop") : (isHi ? "लॉगिन / रजिस्टर" : "Login / Register")}</span>
-      </button>
-    </div>
-
-    <!-- Hero Pastel Card (Screenshot 1) -->
+    <!-- Modern Retail Command Card (Obsidian Handcrafted) -->
     <div class="hero-card">
-      <div class="hero-sub">${t("welcome")}</div>
+      <div class="hero-card-top">
+        <div class="hero-sub">${t("welcome")}</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#94a3b8">
+          <span style="width:8px;height:8px;border-radius:999px;background:#10b981"></span>
+          <span>${esc(DB.settings.shopName || "Store")}</span>
+        </div>
+      </div>
       <h2 class="hero-title">${t("shopFloor")}</h2>
-      <div class="hero-stats">
+      <div class="hero-stats" style="margin-top:14px">
         <div class="hero-stat-card">
           <div class="hero-stat-label">${t("todaySales")}</div>
-          <div class="hero-stat-val">${rs(todayTotal)}</div>
+          <div class="hero-stat-val" style="color:#34d399">${rs(todayTotal)}</div>
         </div>
         <div class="hero-stat-card">
           <div class="hero-stat-label">${t("invoicesToday")}</div>
-          <div class="hero-stat-val">${todayBills.length}</div>
+          <div class="hero-stat-val" style="color:#93c5fd">${todayBills.length}</div>
         </div>
       </div>
 
       <!-- Action Row: Create Bill Now & Add CSV Side-by-Side -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
-        <button type="button" class="btn main" id="btnHeroCreateBill" style="border-radius:14px;font-weight:800;font-size:14px;background:#2563eb;color:#ffffff;box-shadow:0 4px 12px rgba(37,99,235,0.3);border:none;min-height:46px;display:flex;align-items:center;justify-content:center;gap:6px">
-          <span style="font-size:16px">🧾</span>
+        <button type="button" class="btn main" id="btnHeroCreateBill" style="border-radius:12px;font-weight:800;font-size:13.5px;background:#2563eb;color:#ffffff;box-shadow:0 4px 12px rgba(37,99,235,0.4);border:none;min-height:44px;display:flex;align-items:center;justify-content:center;gap:8px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           <span>${t("createBillNow")}</span>
         </button>
-        <button type="button" class="btn" id="btnShopAddCsv" style="border-radius:14px;font-weight:800;font-size:14px;background:#f0fdf4;color:#166534;border:1.5px solid #86efac;box-shadow:0 2px 8px rgba(22,101,52,0.1);min-height:46px;display:flex;align-items:center;justify-content:center;gap:6px">
-          <span style="font-size:16px">📁</span>
-          <span>${isHi ? "CSV से जोड़ें" : "Add CSV"}</span>
+        <button type="button" class="btn" id="btnShopAddCsv" style="border-radius:12px;font-weight:800;font-size:13.5px;background:rgba(255,255,255,0.08);color:#f8fafc;border:1px solid rgba(255,255,255,0.15);min-height:44px;display:flex;align-items:center;justify-content:center;gap:8px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>${isHi ? "CSV से जोड़ें" : "Import CSV"}</span>
         </button>
       </div>
     </div>
@@ -2282,9 +2390,9 @@ function renderShopFloor(){
     </div>
 
     <!-- Items List Header (Clean Title without duplicate buttons) -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 4px;margin-top:6px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 4px;margin-top:4px">
       <div style="font-size:14px;font-weight:800;color:#1e293b;display:flex;align-items:center;gap:6px">
-        <span>👗</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         <span>${t("availableCatalog")} <span id="catalogCountBadge" style="color:#64748b;font-weight:600">(${filtered.length})</span></span>
       </div>
     </div>
@@ -2318,14 +2426,14 @@ function renderShopFloor(){
   const addCsvBtn = $("#btnShopAddCsv");
   if(addCsvBtn) addCsvBtn.onclick = () => go("inventory");
 
-  const shopSwitchBtn = $("#btnShopHeaderSwitch");
-  if(shopSwitchBtn) shopSwitchBtn.onclick = () => openShopSwitchModal();
-
   const emptyBtn = $("#btnEmptyAddCsv");
   if(emptyBtn) emptyBtn.onclick = () => go("inventory");
 
-  const emptyCheckBtn = $("#btnEmptyCheckShop");
-  if(emptyCheckBtn) emptyCheckBtn.onclick = () => openShopSwitchModal();
+  const loadDemoBtn = $("#btnEmptyLoadDemo");
+  if(loadDemoBtn) loadDemoBtn.onclick = loadSampleItemsDirectly;
+
+  const list = $("#itemsList");
+  bindCartItemButtons(list);
 
   renderCartBar();
 }
@@ -2333,46 +2441,61 @@ function renderShopFloor(){
 function renderCatalogItemsListHtml(filtered){
   const isHi = LANG === "hi";
   if(filtered.length){
-    return filtered.map(it => `
+    return filtered.map(it => {
+      const inCart = DB.cart.items.find(x => x.id === it.id);
+      const qty = inCart ? inCart.qty : 0;
+      return `
       <div class="item-row">
         <div class="item-row-left">
-          <div class="item-icon">${getCatIcon(it.cat)}</div>
+          <div class="item-tag">${esc(it.cat || 'Garment')}</div>
           <div>
             <div class="item-title">${esc(it.name)}</div>
             <div class="item-sub">
-              <span style="font-weight:700;color:#0f172a">${rs(it.rate)}</span>
+              <span style="font-weight:800;color:#0f172a;font-size:14px;font-variant-numeric:tabular-nums">${rs(it.rate)}</span>
               <span>·</span>
-              <span>+${it.gst || 5}% GST</span>
+              <span>${it.gst || 5}% GST</span>
               ${it.hsn ? `<span>· HSN ${it.hsn}</span>` : ''}
             </div>
           </div>
         </div>
-        <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-          <span class="pill primary" style="font-size:13px;font-weight:700;padding:4px 10px">${rs(it.rate)}</span>
-          <span style="font-size:11px;color:#64748b;font-weight:600">${esc(it.cat || 'Garment')}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${qty > 0 ? `
+            <div class="item-stepper">
+              <button type="button" data-dec-cart="${it.id}">−</button>
+              <span>${qty}</span>
+              <button type="button" data-inc-cart="${it.id}">＋</button>
+            </div>
+          ` : `
+            <button type="button" class="item-add-btn" data-add-cart="${it.id}">
+              <span>＋</span>
+              <span>${isHi ? "जोड़ें" : "Add"}</span>
+            </button>
+          `}
         </div>
-      </div>
-    `).join("");
+      </div>`;
+    }).join("");
   }
 
   // If store is completely empty (starting state with 0 items)
   if(!DB.items || DB.items.length === 0){
-    return `<div style="text-align:center;padding:36px 16px;background:#ffffff;border-radius:20px;border:1.5px dashed #cbd5e1;margin-top:6px">
-      <div style="font-size:40px;margin-bottom:8px">🛍️</div>
+    return `<div style="text-align:center;padding:36px 16px;background:#ffffff;border-radius:18px;border:1.5px dashed #cbd5e1;margin-top:6px">
+      <div style="width:48px;height:48px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      </div>
       <div style="font-size:16px;font-weight:800;color:#0f172a;margin-bottom:4px">
         ${isHi ? "दुकान में अभी कोई सामान नहीं है" : "No Items in Catalog Yet"}
       </div>
       <div style="font-size:12px;color:#64748b;max-width:340px;margin:0 auto 16px;line-height:1.5">
-        ${isHi ? "कपड़े और रेट जोड़ने के लिए 'CSV से जोड़ें' का उपयोग करें या यदि आपकी दुकान पहले से रजिस्टर्ड है तो दुकान लॉगिन करें।" : "Upload items via CSV or connect your registered shop to restore your catalog."}
+        ${isHi ? "अपनी दुकान के कपड़े और रेट जोड़ने के लिए 'CSV से जोड़ें' पर क्लिक करें या तुरंत 5 डेमो कपड़े लोड करके टेस्ट करें।" : "Upload clothing items via CSV or load 5 demo items to start billing immediately."}
       </div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <button type="button" class="btn main" id="btnEmptyAddCsv" style="background:#16a34a;border:none;border-radius:12px;font-weight:800;padding:10px 20px;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(22,163,74,0.3)">
-          <span>📁</span>
+        <button type="button" class="btn main" id="btnEmptyAddCsv" style="background:#16a34a;border:none;border-radius:10px;font-weight:800;padding:10px 18px;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(22,163,74,0.3)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           <span>${isHi ? "CSV से सामान जोड़ें" : "Add Items via CSV"}</span>
         </button>
-        <button type="button" class="btn" id="btnEmptyCheckShop" style="background:#eff6ff;color:#2563eb;border:1.5px solid #bfdbfe;border-radius:12px;font-weight:800;padding:10px 16px;display:inline-flex;align-items:center;gap:6px">
-          <span>🏢</span>
-          <span>${isHi ? "दुकान चेक / लॉगिन" : "Login Registered Shop"}</span>
+        <button type="button" class="btn" id="btnEmptyLoadDemo" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:10px;font-weight:800;padding:10px 16px;display:inline-flex;align-items:center;gap:6px">
+          <span>⚡</span>
+          <span>${isHi ? "5 सैंपल कपड़े लोड करें" : "Load 5 Demo Items"}</span>
         </button>
       </div>
     </div>`;
@@ -2397,10 +2520,11 @@ function updateShopFloorItems(){
   const list = $("#itemsList");
   if(list){
     list.innerHTML = renderCatalogItemsListHtml(filtered);
+    bindCartItemButtons(list);
     const emptyBtn = $("#btnEmptyAddCsv");
     if(emptyBtn) emptyBtn.onclick = () => go("inventory");
-    const emptyCheckBtn = $("#btnEmptyCheckShop");
-    if(emptyCheckBtn) emptyCheckBtn.onclick = () => openShopSwitchModal();
+    const loadDemoBtn = $("#btnEmptyLoadDemo");
+    if(loadDemoBtn) loadDemoBtn.onclick = loadSampleItemsDirectly;
   }
 }
 
@@ -3153,21 +3277,38 @@ function renderInvoiceCanvas(b){
   ctx.fillRect(0, 139, W, 1);
 
   // Shop Name & Details
-  ctx.font = '800 24px "Plus Jakarta Sans", sans-serif';
+  ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
   ctx.fillStyle = "#0f172a";
   const shopObj = b.shop || DB.settings;
   const sName = shopObj.shopName || DB.settings.shopName || "Bill Book";
-  ctx.fillText(sName, 32, 50);
+
+  // Check if logo is available in DOM to draw onto canvas
+  let textLeft = 32;
+  const logoEl = document.querySelector("#logoBadge img") || document.querySelector("#logoPreviewBox img");
+  if(logoEl && logoEl.complete && logoEl.naturalWidth > 0 && shopObj.logo){
+    try {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(32 + 25, 60, 25, 0, Math.PI * 2, true);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(logoEl, 32, 35, 50, 50);
+      ctx.restore();
+      textLeft = 94;
+    } catch(err){}
+  }
+
+  ctx.fillText(sName, textLeft, 52);
 
   ctx.font = '500 13px "Plus Jakarta Sans", sans-serif';
   ctx.fillStyle = "#64748b";
   const sAddr = shopObj.address || DB.settings.address || "";
-  if(sAddr) ctx.fillText(sAddr, 32, 74);
+  if(sAddr) ctx.fillText(sAddr, textLeft, 74);
   const sMob = shopObj.mobile || DB.settings.mobile || "";
   const sGst = shopObj.gstin || DB.settings.gstin || "";
   let contactStr = sMob ? ("Phone: +91 " + sMob) : "";
   if(sGst) contactStr += (contactStr ? "  ·  " : "") + "GSTIN: " + sGst;
-  if(contactStr) ctx.fillText(contactStr, 32, sAddr ? 94 : 74);
+  if(contactStr) ctx.fillText(contactStr, textLeft, sAddr ? 94 : 74);
 
   // Invoice Title
   ctx.font = '800 14px "Plus Jakarta Sans", sans-serif';
@@ -3732,61 +3873,79 @@ function renderBills(){
 function renderInventory(){
   const isHi = LANG === "hi";
 
-  $("#app").innerHTML = `<div class="stack">
+  $("#app").innerHTML = `<div class="stack" style="gap:14px">
     <!-- Top Return Bar -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <button type="button" class="btn sm" id="btnBackToShop" style="background:#ffffff;border:1.5px solid #cbd5e1;border-radius:12px;font-weight:700;color:#334155;padding:6px 14px;display:flex;align-items:center;gap:6px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <button type="button" class="btn sm" id="btnBackToShop" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:10px;font-weight:700;color:#0f172a;padding:7px 14px;display:flex;align-items:center;gap:6px">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
         <span>${isHi ? "दुकान (Shop Floor)" : "Back to Shop"}</span>
       </button>
-      <div style="font-size:13px;font-weight:800;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;padding:4px 12px;border-radius:999px">
-        📁 ${isHi ? "CSV इन्वेंटरी" : "CSV Manager"}
+      <div style="font-size:12px;font-weight:800;color:#0f172a;background:#f1f5f9;border:1px solid #e2e8f0;padding:5px 12px;border-radius:8px">
+        📁 ${isHi ? "CSV इन्वेंटरी" : "CSV Inventory"}
       </div>
     </div>
 
-    <!-- Screen Title -->
+    <!-- Header Section -->
     <div>
-      <h2 style="font-size:22px;font-weight:800;margin:0 0 4px;color:#0f172a">${isHi ? "CSV से सामान जोड़ें" : "CSV Inventory Manager"}</h2>
-      <div class="small muted" style="color:#64748b;font-size:13px">
-        ${isHi ? "Excel या CSV फ़ाइल से अपनी दुकान के सारे कपड़े, रेट और टैक्स आसानी से जोड़ें।" : "Import clothing items, rates, and GST into your shop from an Excel or CSV file."}
+      <h2 style="font-size:22px;font-weight:800;margin:0 0 4px;color:#0f172a;letter-spacing:-0.02em">
+        ${isHi ? "कपड़े व रेट इम्पोर्ट करें" : "Import Store Inventory"}
+      </h2>
+      <div style="color:#64748b;font-size:13px;line-height:1.5">
+        ${isHi ? "CSV फ़ाइल चुनें, सैंपल डाउनलोड करें या सीधे 1-क्लिक में 5 डेमो कपड़े लोड करें।" : "Select CSV file, download template, or load 5 demo items with 1-tap."}
       </div>
     </div>
 
-    <!-- 2 Clear Action Cards -->
-    <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px">
-      <!-- Card 1: Download Sample CSV -->
-      <div class="card stack" style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:18px;padding:18px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="width:40px;height:40px;border-radius:12px;background:#ffffff;border:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center;font-size:20px">📥</div>
+    <!-- Grid of 3 Clear, Handcrafted Action Cards -->
+    <div class="stack" style="gap:12px">
+      <!-- Card 1: Select CSV File -->
+      <div class="card" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <div style="width:38px;height:38px;border-radius:10px;background:#f0fdf4;color:#16a34a;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid #bbf7d0">📁</div>
           <div>
-            <div style="font-size:15px;font-weight:800;color:#0f172a">1. ${isHi ? "सैंपल CSV डाउनलोड करें" : "Download Sample CSV"}</div>
-            <div style="font-size:12px;color:#64748b;margin-top:2px">
-              ${isHi ? "कुर्ता, साड़ी, लहंगा, शर्ट आदि के नाम, रेट, HSN और GST का रेडीमेड फ़ॉर्मेट।" : "Pre-formatted template with Kurtis, Sarees, Jeans, Shirts, HSN codes & GST rates."}
-            </div>
+            <div style="font-size:15px;font-weight:800;color:#0f172a">1. ${isHi ? "फ़ोन से CSV फ़ाइल चुनें" : "Select CSV File from Phone"}</div>
+            <div style="font-size:12px;color:#64748b">${isHi ? "स्टोरेज से अपनी CSV या Excel फ़ाइल अपलोड करें" : "Browse internal storage or Downloads"}</div>
           </div>
         </div>
-        <button type="button" class="btn" id="btnSampleCsv" style="background:#ffffff;border:1.5px solid #cbd5e1;border-radius:12px;font-weight:700;color:#0f172a;min-height:44px;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px">
-          <span>📥</span>
-          <span>${isHi ? "सैंपल CSV डाउनलोड करें (Download Template)" : "Download Sample Template"}</span>
-        </button>
+        <input type="file" id="csvFileInput" accept="*/*" style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px;">
+        <label for="csvFileInput" class="btn main" id="btnUploadCsv" style="cursor:pointer;background:#16a34a;border:none;border-radius:10px;font-weight:800;color:#ffffff;min-height:44px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-shadow:0 2px 8px rgba(22,163,74,0.3)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>${isHi ? "फ़ाइल चुनें (Browse Storage)" : "Browse Storage & Upload"}</span>
+        </label>
       </div>
 
-      <!-- Card 2: Upload CSV -->
-      <div class="card stack" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:18px;padding:18px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="width:40px;height:40px;border-radius:12px;background:#ffffff;border:1px solid #86efac;display:flex;align-items:center;justify-content:center;font-size:20px">📁</div>
+      <!-- Card 2: Sample CSV & 1-Tap Load -->
+      <div class="card" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <div style="width:38px;height:38px;border-radius:10px;background:#eff6ff;color:#2563eb;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid #bfdbfe">📥</div>
           <div>
-            <div style="font-size:15px;font-weight:800;color:#166534">2. ${isHi ? "अपनी CSV फ़ाइल अपलोड करें" : "Upload Your CSV File"}</div>
-            <div style="font-size:12px;color:#15803d;margin-top:2px">
-              ${isHi ? "फ़ाइल चुनते ही सारे आइटम और उनके रेट दुकान की लिस्ट में जुड़ जाएँगे।" : "Items and rates from your CSV will be added directly into your store catalog."}
-            </div>
+            <div style="font-size:15px;font-weight:800;color:#0f172a">2. ${isHi ? "सैंपल CSV टेम्पलेट" : "Sample Template"}</div>
+            <div style="font-size:12px;color:#64748b">${isHi ? "रेडीमेड फ़ॉर्मेट डाउनलोड करें या सीधे 5 कपड़े लोड करें" : "Download format or load 5 demo items instantly"}</div>
           </div>
         </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button type="button" class="btn" id="btnSampleCsv" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:10px;font-weight:700;color:#0f172a;min-height:42px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>${isHi ? "सैंपल डाउनलोड" : "Download Sample"}</span>
+          </button>
+          <button type="button" class="btn" id="btnLoadDemoItems" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;font-weight:800;color:#2563eb;min-height:42px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px">
+            <span>⚡</span>
+            <span>${isHi ? "5 कपड़े लोड करें" : "Load 5 Demo Items"}</span>
+          </button>
+        </div>
+      </div>
 
-        <input type="file" id="csvFileInput" accept=".csv,text/csv" hidden>
-        <button type="button" class="btn main" id="btnUploadCsv" style="background:#16a34a;border:none;border-radius:12px;font-weight:800;color:#ffffff;min-height:46px;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;box-shadow:0 4px 12px rgba(22,163,74,0.3)">
-          <span>📁</span>
-          <span>${isHi ? "CSV फ़ाइल चुनें (Upload CSV)" : "Select CSV File to Upload"}</span>
+      <!-- Card 3: Paste CSV Text Directly -->
+      <div class="card" style="background:#ffffff;border:1px solid #cbd5e1;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <div style="width:38px;height:38px;border-radius:10px;background:#f8fafc;color:#475569;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid #e2e8f0">📋</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:#0f172a">3. ${isHi ? "सीधा टेक्स्ट पेस्ट करें (Fastest)" : "Paste Text Directly"}</div>
+            <div style="font-size:12px;color:#64748b">${isHi ? "WhatsApp या Notes से कॉपी किया डेटा यहाँ पेस्ट करें" : "Paste comma-separated items from WhatsApp"}</div>
+          </div>
+        </div>
+        <button type="button" class="btn" id="btnOpenPasteCsv" style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;font-weight:700;color:#0f172a;min-height:42px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-size:13px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+          <span>${isHi ? "टेक्स्ट पेस्ट करके इम्पोर्ट करें" : "Paste CSV Text"}</span>
         </button>
       </div>
     </div>
@@ -3794,7 +3953,7 @@ function renderInventory(){
     <!-- Items Currently in Catalog -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 4px 0;margin-top:8px">
       <div style="font-size:14px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:6px">
-        <span>👗</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         <span>${isHi ? "दुकान में कुल सामान" : "Current Store Items"} (${DB.items.length})</span>
       </div>
     </div>
@@ -3803,18 +3962,18 @@ function renderInventory(){
       ${DB.items.map(it => `
         <div class="item-row">
           <div class="item-row-left">
-            <div class="item-icon">${getCatIcon(it.cat)}</div>
+            <div class="item-tag">${esc(it.cat || 'Garment')}</div>
             <div>
               <div class="item-title">${esc(it.name)}</div>
               <div class="item-sub">
-                <span style="font-weight:700;color:#0f172a">${rs(it.rate)}</span>
+                <span style="font-weight:800;color:#0f172a;font-size:14px;font-variant-numeric:tabular-nums">${rs(it.rate)}</span>
                 <span>·</span>
                 <span>GST ${it.gst || 5}%</span>
                 ${it.hsn ? `<span>· HSN ${it.hsn}</span>` : ''}
               </div>
             </div>
           </div>
-          <button type="button" class="btn sm danger" data-del-item="${it.id}">✕</button>
+          <button type="button" class="btn sm danger" data-del-item="${it.id}" style="padding:4px 10px;border-radius:8px">✕</button>
         </div>
       `).join("")}
     </div>
@@ -3823,14 +3982,24 @@ function renderInventory(){
   $("#btnBackToShop").onclick = () => go("home");
 
   const fileInp = $("#csvFileInput");
-  $("#btnUploadCsv").onclick = () => fileInp.click();
-  $("#btnSampleCsv").onclick = downloadSampleCsvFile;
+  if(fileInp){
+    fileInp.onchange = e => {
+      if(e.target.files.length){
+        parseAndImportCsv(e.target.files[0], () => renderInventory());
+      }
+    };
+  }
 
-  fileInp.onchange = e => {
-    if(e.target.files.length){
-      parseAndImportCsv(e.target.files[0], () => renderInventory());
-    }
-  };
+  const btnUp = $("#btnUploadCsv");
+  if(btnUp && fileInp){
+    btnUp.onclick = (e) => {
+      if(e.target.tagName !== "LABEL") fileInp.click();
+    };
+  }
+
+  $("#btnSampleCsv").onclick = downloadSampleCsvFile;
+  $("#btnLoadDemoItems").onclick = loadSampleItemsDirectly;
+  $("#btnOpenPasteCsv").onclick = openPasteCsvModal;
 
   document.querySelectorAll("[data-del-item]").forEach(b => {
     b.onclick = () => {
@@ -3841,56 +4010,156 @@ function renderInventory(){
   });
 }
 
-function parseAndImportCsv(file, onDone){
-  const rd = new FileReader();
-  rd.onload = e => {
-    const lines = e.target.result.split(/\r?\n/).filter(l => l.trim().length > 0);
-    if(lines.length <= 1){
-      toast(LANG === "hi" ? "CSV फ़ाइल में कोई सामान नहीं मिला" : "No items found in CSV");
-      return;
-    }
-    const header = lines[0].split(",").map(c => c.trim().toLowerCase());
-    let nameIdx = header.findIndex(h => h.includes("name") || h.includes("item") || h.includes("सामान") || h.includes("कपड़ा"));
-    if(nameIdx === -1) nameIdx = 0;
-    let catIdx = header.findIndex(h => h.includes("cat") || h.includes("टाइप") || h.includes("श्रेणी"));
-    let rateIdx = header.findIndex(h => h.includes("rate") || h.includes("price") || h.includes("रेट") || h.includes("कीमत") || h.includes("mrp"));
-    let hsnIdx = header.findIndex(h => h.includes("hsn"));
-    let gstIdx = header.findIndex(h => h.includes("gst") || h.includes("टैक्स"));
+function importCsvText(csvText, onDone){
+  if(!csvText || typeof csvText !== "string") return;
+  const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
+  if(lines.length <= 1){
+    toast(LANG === "hi" ? "CSV में कोई सामान नहीं मिला" : "No items found in CSV");
+    return;
+  }
+  const firstLine = lines[0];
+  const delim = firstLine.includes("\t") ? "\t" : (firstLine.includes(";") && !firstLine.includes(",") ? ";" : ",");
+  const header = firstLine.split(delim).map(c => c.trim().toLowerCase().replace(/^["']|["']$/g, ""));
+  let nameIdx = header.findIndex(h => h.includes("name") || h.includes("item") || h.includes("सामान") || h.includes("कपड़ा"));
+  if(nameIdx === -1) nameIdx = 0;
+  let catIdx = header.findIndex(h => h.includes("cat") || h.includes("टाइप") || h.includes("श्रेणी"));
+  let rateIdx = header.findIndex(h => h.includes("rate") || h.includes("price") || h.includes("रेट") || h.includes("कीमत") || h.includes("mrp"));
+  let hsnIdx = header.findIndex(h => h.includes("hsn"));
+  let gstIdx = header.findIndex(h => h.includes("gst") || h.includes("टैक्स"));
 
-    let added = 0;
-    for(let i = 1; i < lines.length; i++){
-      const cols = lines[i].split(",").map(c => c.trim().replace(/^["']|["']$/g, ""));
-      const name = cols[nameIdx];
-      if(!name) continue;
-      const cat = (catIdx !== -1 && cols[catIdx]) ? cols[catIdx] : "Garment";
-      const rate = (rateIdx !== -1 && Number(cols[rateIdx]) && Number(cols[rateIdx]) > 0) ? Number(cols[rateIdx]) : 500;
-      const hsn = hsnIdx !== -1 ? cols[hsnIdx] : "6204";
-      const gst = (gstIdx !== -1 && !isNaN(Number(cols[gstIdx]))) ? Number(cols[gstIdx]) : 5;
-      DB.items.push({ id: uid(), name, cat, rate, gst, hsn });
-      added++;
-    }
-    persist();
-    toast(LANG === "hi" ? `✅ ${added} नए सामान लिस्ट में जुड़ गए!` : `✅ ${added} items imported from CSV!`);
-    if(typeof onDone === "function"){
-      onDone();
-    } else if(VIEW === "inventory"){
-      renderInventory();
-    } else {
-      render();
-    }
-  };
+  let added = 0;
+  for(let i = 1; i < lines.length; i++){
+    const cols = lines[i].split(delim).map(c => c.trim().replace(/^["']|["']$/g, ""));
+    const name = cols[nameIdx];
+    if(!name) continue;
+    const cat = (catIdx !== -1 && cols[catIdx]) ? cols[catIdx] : "Garment";
+    const rate = (rateIdx !== -1 && Number(cols[rateIdx]) && Number(cols[rateIdx]) > 0) ? Number(cols[rateIdx]) : 500;
+    const hsn = hsnIdx !== -1 ? cols[hsnIdx] : "6204";
+    const gst = (gstIdx !== -1 && !isNaN(Number(cols[gstIdx]))) ? Number(cols[gstIdx]) : 5;
+    DB.items.push({ id: uid(), name, cat, rate, gst, hsn });
+    added++;
+  }
+  persist();
+  toast(LANG === "hi" ? `✅ ${added} नए सामान लिस्ट में जुड़ गए!` : `✅ ${added} items imported!`);
+  if(typeof onDone === "function"){
+    onDone();
+  } else if(VIEW === "inventory"){
+    renderInventory();
+  } else {
+    render();
+  }
+}
+
+function parseAndImportCsv(file, onDone){
+  if(!file) return;
+  const rd = new FileReader();
+  rd.onload = e => importCsvText(e.target.result, onDone);
+  rd.onerror = () => toast("Error reading file");
   rd.readAsText(file);
 }
 
-function downloadSampleCsvFile(){
+async function downloadSampleCsvFile(){
   const content = "Item Name,Category,Rate,GST Rate,HSN Code\n" +
     "Handloom Cotton Kurta,Kurta,850,5,6204\n" +
     "Premium Silk Saree,Saree,3500,12,5208\n" +
     "Festive Georgette Lehenga,Lehenga,6499,12,6204\n" +
     "Slim Fit Cotton Shirt,Shirt,799,5,6205\n" +
     "Stretch Denim Jeans,Jeans,1299,5,6203\n";
-  const blob = new Blob(["\uFEFF" + content], { type: "text/csv;charset=utf-8;" });
-  downloadBlob(blob, "Sample_Items_KapdaBill.csv");
+
+  // 1. Copy sample text to clipboard as guaranteed instant backup on mobile
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    try { await navigator.clipboard.writeText(content); } catch(e){}
+  }
+
+  // 2. If Capacitor Plugins are available, write to DOCUMENTS or trigger Native Share
+  const cap = window.Capacitor;
+  if(cap && cap.Plugins){
+    if(cap.Plugins.Filesystem){
+      try {
+        const res = await cap.Plugins.Filesystem.writeFile({
+          path: "Sample_Items_KapdaBill.csv",
+          data: content,
+          directory: "DOCUMENTS",
+          encoding: "utf8"
+        });
+        if(cap.Plugins.Share && res && res.uri){
+          await cap.Plugins.Share.share({
+            title: "Sample_Items_KapdaBill.csv",
+            url: res.uri,
+            dialogTitle: "Save / Open Sample CSV"
+          });
+          toast(LANG === "hi" ? "✅ सैंपल CSV Documents में सेव हो गया!" : "✅ Sample CSV saved to Documents!");
+          return;
+        }
+      } catch(fsErr){
+        console.warn("Filesystem save fallback:", fsErr);
+      }
+    }
+    if(cap.Plugins.Share){
+      try {
+        await cap.Plugins.Share.share({
+          title: "Sample_Items_KapdaBill.csv",
+          text: content,
+          dialogTitle: "Save / Share Sample CSV"
+        });
+        toast(LANG === "hi" ? "✅ सैंपल CSV शेयर / सेव हो गया!" : "✅ Sample CSV shared!");
+        return;
+      } catch(shareErr){}
+    }
+  }
+
+  // 3. Fallback standard Web / WebView download using Data URI (supported by Android WebViews)
+  try {
+    const encodedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(content);
+    const a = document.createElement("a");
+    a.href = encodedUri;
+    a.download = "Sample_Items_KapdaBill.csv";
+    a.target = "_blank";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch(e){}
+
+  toast(LANG === "hi" ? "✅ सैंपल CSV डाउनलोड हुआ व क्लिपबोर्ड पर कॉपी हो गया!" : "✅ Sample CSV downloaded & copied to clipboard!");
+}
+
+function openPasteCsvModal(){
+  const modalHost = $("#modalHost");
+  const isHi = LANG === "hi";
+
+  modalHost.innerHTML = `<div class="scrim" id="pasteCsvScrim" role="dialog">
+    <div class="sheet sheet-slide-in" style="max-height:85vh">
+      <div class="sheet-drag-handle"></div>
+      <div class="sheet-header">
+        <div>
+          <h3 class="sheet-title">${isHi ? "CSV टेक्स्ट पेस्ट करें" : "Paste CSV / Excel Data"}</h3>
+          <div class="sheet-sub">${isHi ? "WhatsApp या Notes से कॉपी किया डेटा यहाँ पेस्ट करें" : "Paste text copied from WhatsApp, Notes or Excel"}</div>
+        </div>
+        <button type="button" class="sheet-close" id="btnClosePasteCsv">✕</button>
+      </div>
+
+      <div class="stack" style="gap:12px;margin-top:8px">
+        <textarea id="rawCsvText" rows="6" class="cust-inp" style="font-family:monospace;font-size:12px;line-height:1.4" placeholder="Item Name,Category,Rate,GST,HSN&#10;Cotton Kurta,Kurta,850,5,6204&#10;Silk Saree,Saree,3500,12,5208"></textarea>
+        <button type="button" class="btn main" id="btnSubmitRawCsv" style="background:#2563eb;color:#ffffff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:14px">
+          ${isHi ? "इम्पोर्ट करें (Import Items)" : "Import Items"}
+        </button>
+      </div>
+    </div>
+  </div>`;
+
+  const close = () => { modalHost.innerHTML = ""; };
+  $("#btnClosePasteCsv").onclick = close;
+  $("#pasteCsvScrim").onclick = e => { if(e.target.id === "pasteCsvScrim") close(); };
+
+  $("#btnSubmitRawCsv").onclick = () => {
+    const raw = $("#rawCsvText").value.trim();
+    if(!raw){
+      toast(isHi ? "कृपया टेक्स्ट दर्ज करें" : "Please paste some CSV text");
+      return;
+    }
+    close();
+    importCsvText(raw, () => renderInventory());
+  };
 }
 
 /* ================= SETTINGS VIEW ================= */
@@ -3901,34 +4170,9 @@ function renderSetup(){
   $("#app").innerHTML = `<div class="stack">
     <h2 style="font-size:22px;font-weight:800;margin:0 0 8px">${t("setup")}</h2>
 
-    <!-- SaaS Multi-Shop Account Card -->
-    <div class="card stack" style="box-shadow:0 4px 18px rgba(0,0,0,0.06);border-radius:20px;padding:18px;border:1.5px solid #bfdbfe;background:linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div style="display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;color:#1e40af">
-          <span>🏢</span>
-          <span>${isHi ? "SaaS दुकान खाता (Multi-Shop Manager)" : "SaaS Shop Account (Multi-Shop)"}</span>
-        </div>
-        <span class="pill primary" style="font-size:11px;font-weight:800">${DB.items.length} ${isHi ? "सामान" : "Items"}</span>
-      </div>
-      <div style="font-size:13px;color:#334155;margin:4px 0 10px;line-height:1.5">
-        <strong>${isHi ? "सक्रिय दुकान:" : "Active Shop:"}</strong> ${esc(DB.settings.shopName || (isHi ? "कोई दुकान सेट नहीं है" : "None set"))}
-        ${DB.settings.mobile ? `· 📱 ${esc(DB.settings.mobile)}` : ''}
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <button type="button" class="btn" id="btnSaaSSwitchShop" style="background:#2563eb;color:#ffffff;border:none;border-radius:12px;font-weight:800;padding:10px;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 12px rgba(37,99,235,0.3)">
-          <span>🔄</span>
-          <span>${isHi ? "दुकान चेक / बदलें" : "Check / Switch Shop"}</span>
-        </button>
-        <button type="button" class="btn" id="btnSaaSNewShop" style="background:#f0fdf4;color:#166534;border:1.5px solid #86efac;border-radius:12px;font-weight:800;padding:10px;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px">
-          <span>➕</span>
-          <span>${isHi ? "नई दुकान (0 सामान)" : "New Shop (0 Items)"}</span>
-        </button>
-      </div>
-    </div>
-
-    <form class="card stack" id="setupForm" style="box-shadow:0 4px 18px rgba(0,0,0,0.06);border-radius:20px;padding:20px">
+    <form class="card stack" id="setupForm" style="box-shadow:0 1px 4px rgba(0,0,0,0.05);border-radius:18px;padding:20px;border:1px solid #e2e8f0;background:#ffffff">
       <div style="font-size:16px;font-weight:800;color:#0f172a;margin-bottom:2px;display:flex;align-items:center;gap:8px">
-        <span>🏪</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span>${isHi ? "दुकान की जानकारी (Shop Profile)" : "Shop Profile & Details"}</span>
       </div>
       <div class="small muted" style="margin-bottom:12px;font-size:12px;color:#64748b">
@@ -3948,39 +4192,38 @@ function renderSetup(){
       <input type="text" id="sGstin" class="cust-inp" value="${esc(s.gstin || '')}" placeholder="23AAAAA0000A1Z5">
 
       <label class="cust-label">${t("logo")} (${isHi ? "दुकान का लोगो" : "Shop Logo"})</label>
-      <div class="row" style="align-items:center;gap:12px">
-        ${s.logo ? `<img src="${s.logo}" style="width:52px;height:52px;border-radius:12px;object-fit:cover;border:2px solid #cbd5e1;box-shadow:0 2px 6px rgba(0,0,0,0.08)">` : `<div style="width:52px;height:52px;border-radius:12px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:24px;border:1.5px dashed #cbd5e1">🏪</div>`}
+      <div class="row" style="align-items:center;gap:14px">
+        <div id="logoPreviewBox" style="width:56px;height:56px;border-radius:14px;background:#f8fafc;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1.5px solid #cbd5e1;box-shadow:0 1px 4px rgba(0,0,0,0.06);flex-shrink:0">
+          ${s.logo ? `<img src="${s.logo}" style="width:100%;height:100%;object-fit:cover">` : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`}
+        </div>
         <div style="display:flex;flex-direction:column;gap:6px">
-          <label class="btn sm" for="sLogoInp" style="cursor:pointer;font-weight:700">📷 ${s.logo ? (isHi ? "लोगो बदलें" : "Change Logo") : t("pickLogo")}</label>
-          <input type="file" id="sLogoInp" accept="image/*" hidden>
-          ${s.logo ? `<button type="button" class="btn sm danger" id="btnRmLogo" style="font-size:11px">${t("removeLogo")}</button>` : ''}
+          <label for="sLogoInp" class="btn sm" id="btnPickLogoTrigger" style="cursor:pointer;font-weight:700;background:#ffffff;border:1.5px solid #cbd5e1;border-radius:10px;padding:6px 14px;color:#0f172a;display:inline-flex;align-items:center;gap:6px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>${s.logo ? (isHi ? "लोगो बदलें" : "Change Logo") : (isHi ? "लोगो चुनें" : "Upload Logo")}</span>
+          </label>
+          <input type="file" id="sLogoInp" accept="image/*" style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px;">
+          ${s.logo ? `<button type="button" class="btn sm danger" id="btnRmLogo" style="font-size:11px;padding:4px 10px;border-radius:8px">${t("removeLogo")}</button>` : ''}
         </div>
       </div>
 
       <label class="cust-label">${t("thanks")}</label>
       <input type="text" id="sThanks" class="cust-inp" value="${esc(s.thanks || '')}">
 
-      <button type="submit" class="btn main" id="btnSaveShopDetails" style="margin-top:14px;border-radius:14px;min-height:48px;font-weight:800;font-size:15px;background:#2563eb;color:#ffffff;box-shadow:0 4px 14px rgba(37,99,235,0.35);border:none">
+      <button type="submit" class="btn main" id="btnSaveShopDetails" style="margin-top:14px;border-radius:12px;min-height:46px;font-weight:800;font-size:15px;background:#2563eb;color:#ffffff;box-shadow:0 4px 12px rgba(37,99,235,0.35);border:none">
         💾 ${isHi ? "दुकान की जानकारी सेव करें (Save)" : "Save Shop Details"}
       </button>
     </form>
 
     <!-- Data Backup & Restore -->
-    <div class="card stack">
-      <h3 style="font-size:16px;font-weight:800;margin:0">${t("backup")}</h3>
+    <div class="card stack" style="border-radius:18px;border:1px solid #e2e8f0;padding:18px;background:#ffffff">
+      <h3 style="font-size:15px;font-weight:800;margin:0;color:#0f172a">${t("backup")}</h3>
       <div class="row">
-        <button type="button" class="btn sm grow" id="btnDownloadBackup">📥 ${t("makeBackup")}</button>
-        <label class="btn sm grow" for="rsFileInp">📤 ${t("restore")}</label>
+        <button type="button" class="btn sm grow" id="btnDownloadBackup" style="border-radius:10px;font-weight:700">📥 ${t("makeBackup")}</button>
+        <label class="btn sm grow" for="rsFileInp" style="border-radius:10px;font-weight:700">📤 ${t("restore")}</label>
         <input type="file" id="rsFileInp" accept=".json" hidden>
       </div>
     </div>
   </div>`;
-
-  const btnSwitch = $("#btnSaaSSwitchShop");
-  if(btnSwitch) btnSwitch.onclick = () => openShopSwitchModal();
-
-  const btnNew = $("#btnSaaSNewShop");
-  if(btnNew) btnNew.onclick = () => openShopSwitchModal();
 
   const saveLiveSettings = () => {
     DB.settings.shopName = $("#sName").value.trim();
@@ -4000,18 +4243,27 @@ function renderSetup(){
     }
   });
 
-  $("#sLogoInp").onchange = e => {
-    const f = e.target.files[0];
-    if(!f) return;
-    const rd = new FileReader();
-    rd.onload = () => {
-      DB.settings.logo = rd.result;
-      persist();
-      updateHeader();
-      renderSetup();
+  const logoInp = $("#sLogoInp");
+  const btnPick = $("#btnPickLogoTrigger");
+  if(btnPick && logoInp){
+    btnPick.onclick = (e) => {
+      if(e.target.tagName !== "LABEL") logoInp.click();
     };
-    rd.readAsDataURL(f);
-  };
+  }
+
+  if(logoInp){
+    logoInp.onchange = e => {
+      const f = e.target.files[0];
+      if(!f) return;
+      compressImage(f, 280, 0.85, (dataUrl) => {
+        DB.settings.logo = dataUrl;
+        persist();
+        updateHeader();
+        renderSetup();
+        toast(isHi ? "✅ दुकान का लोगो अपडेट हो गया!" : "✅ Shop logo updated successfully!");
+      });
+    };
+  }
 
   if($("#btnRmLogo")){
     $("#btnRmLogo").onclick = () => {
