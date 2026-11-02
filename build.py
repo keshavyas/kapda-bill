@@ -57,7 +57,15 @@ self.addEventListener("fetch",e=>{
 '''%VER
 (d/'sw.js').write_text(sw,encoding='utf-8')
 
-if HAS_PIL:
+# Copy icons from src/icons if present
+icons_dir = root / 'src/icons'
+if icons_dir.exists():
+    import shutil
+    for ic in ["icon-192.png", "icon-512.png", "icon-maskable-512.png"]:
+        src_ic = icons_dir / ic
+        if src_ic.exists():
+            shutil.copy2(src_ic, d / ic)
+elif HAS_PIL:
     font=None
     for f in ["/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"]:
         try: font=f; ImageFont.truetype(f,10)
